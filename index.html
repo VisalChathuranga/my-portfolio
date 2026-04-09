@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Visal Chathuranga — AI Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600;9..144,900&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0c0a;
+  --bg-elev: #13130f;
+  --fg: #f2ede1;
+  --fg-dim: #8f8b80;
+  --fg-mute: #55524b;
+  --accent: #c5ff3a;
+  --accent-dim: #8fb825;
+  --line: #23231e;
+  --serif: 'Fraunces', Georgia, serif;
+  --sans: 'Manrope', -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+  font-weight: 300;
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Grain overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  z-index: 100;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' /%3E%3C/svg%3E");
+}
+
+::selection { background: var(--accent); color: var(--bg); }
+
+a { color: inherit; text-decoration: none; }
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+/* NAV */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 50;
+  padding: 28px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(12px);
+  background: rgba(12, 12, 10, 0.7);
+  border-bottom: 1px solid var(--line);
+}
+
+.nav-logo {
+  font-family: var(--serif);
+  font-weight: 900;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+}
+.nav-logo span { color: var(--accent); }
+
+.nav-links {
+  display: flex;
+  gap: 36px;
+  font-family: var(--mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.nav-links a {
+  position: relative;
+  transition: color 0.3s;
+}
+.nav-links a::before {
+  content: '';
+  position: absolute;
+  left: 0; bottom: -4px;
+  width: 0;
+  height: 1px;
+  background: var(--accent);
+  transition: width 0.3s;
+}
+.nav-links a:hover { color: var(--accent); }
+.nav-links a:hover::before { width: 100%; }
+
+/* HERO */
+.hero {
+  min-height: 100vh;
+  padding: 160px 0 80px;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.hero-meta {
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--fg-dim);
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: fadeUp 0.8s ease-out;
+}
+.hero-meta::before {
+  content: '';
+  width: 40px;
+  height: 1px;
+  background: var(--accent);
+}
+
+.hero h1 {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: clamp(56px, 9vw, 148px);
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+  margin-bottom: 40px;
+  animation: fadeUp 1s ease-out 0.1s both;
+}
+.hero h1 .italic {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--accent);
+}
+.hero h1 .block { display: block; }
+
+.hero-desc {
+  max-width: 520px;
+  font-size: 17px;
+  color: var(--fg-dim);
+  line-height: 1.65;
+  margin-bottom: 48px;
+  animation: fadeUp 1s ease-out 0.25s both;
+}
+.hero-desc strong { color: var(--fg); font-weight: 500; }
+
+.hero-cta {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  animation: fadeUp 1s ease-out 0.4s both;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 28px;
+  font-family: var(--mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+.btn-primary {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+.btn-primary:hover { background: transparent; color: var(--accent); transform: translateY(-2px); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+.btn .arrow { transition: transform 0.3s; }
+.btn:hover .arrow { transform: translateX(4px); }
+
+/* Hero image */
+.hero-image {
+  position: relative;
+  animation: fadeIn 1.2s ease-out 0.3s both;
+}
+.hero-image-wrap {
+  position: relative;
+  aspect-ratio: 3/4;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+.hero-image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 50%;
+  filter: grayscale(0.3) contrast(1.05);
+  transition: filter 0.6s;
+}
+.hero-image-wrap:hover img { filter: grayscale(0) contrast(1); }
+.hero-image::before {
+  content: '';
+  position: absolute;
+  top: -20px; left: -20px;
+  width: 100%; height: 100%;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  z-index: -1;
+}
+.hero-image-tag {
+  position: absolute;
+  bottom: 20px; left: 20px;
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: var(--bg);
+  padding: 8px 14px;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+
+/* Marquee */
+.marquee {
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 28px 0;
+  overflow: hidden;
+  white-space: nowrap;
+  margin-top: 60px;
+}
+.marquee-track {
+  display: inline-flex;
+  gap: 60px;
+  animation: scroll 40s linear infinite;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 28px;
+  color: var(--fg-dim);
+}
+.marquee-track span { display: inline-flex; align-items: center; gap: 60px; }
+.marquee-track .dot { color: var(--accent); font-style: normal; }
+
+/* SECTION */
+section {
+  padding: 140px 0;
+  position: relative;
+}
+.section-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-label::before {
+  content: '';
+  width: 40px; height: 1px;
+  background: var(--accent);
+}
+.section-title {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: clamp(44px, 6vw, 88px);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  margin-bottom: 80px;
+  max-width: 900px;
+}
+.section-title em {
+  font-style: italic;
+  color: var(--accent);
+  font-weight: 400;
+}
+
+/* ABOUT */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+}
+.about-text p {
+  font-size: 19px;
+  line-height: 1.7;
+  color: var(--fg-dim);
+  margin-bottom: 24px;
+}
+.about-text p strong { color: var(--fg); font-weight: 500; }
+.about-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+.stat {
+  padding: 40px 28px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.stat-num {
+  font-family: var(--serif);
+  font-size: 64px;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.stat-num sup { font-size: 32px; }
+.stat-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--fg-dim);
+}
+
+/* EXPERIENCE */
+.experience {
+  margin-top: 80px;
+  border-top: 1px solid var(--line);
+}
+.exp-item {
+  display: grid;
+  grid-template-columns: 180px 1fr 200px;
+  gap: 40px;
+  padding: 36px 0;
+  border-bottom: 1px solid var(--line);
+  transition: all 0.4s;
+}
+.exp-item:hover { padding-left: 20px; }
+.exp-item:hover .exp-role { color: var(--accent); }
+.exp-date {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--fg-dim);
+  letter-spacing: 0.05em;
+}
+.exp-role {
+  font-family: var(--serif);
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  transition: color 0.3s;
+}
+.exp-role .company {
+  display: block;
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--fg-dim);
+  font-weight: 300;
+  margin-top: 6px;
+  letter-spacing: 0;
+}
+.exp-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+.exp-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--fg-dim);
+}
+
+/* SKILLS */
+.skills-wrap {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+.skill-group {
+  background: var(--bg);
+  padding: 40px 36px;
+  transition: background 0.3s;
+}
+.skill-group:hover { background: var(--bg-elev); }
+.skill-group-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.skill-group-num {
+  font-family: var(--serif);
+  font-size: 14px;
+  font-style: italic;
+  color: var(--fg-mute);
+  float: right;
+}
+.skill-group-title {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  margin-bottom: 24px;
+  clear: both;
+}
+.skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.skill-tags span {
+  font-size: 14px;
+  color: var(--fg-dim);
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  transition: all 0.25s;
+}
+.skill-tags span:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+/* PROJECTS */
+.projects-intro {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 40px;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+.projects-intro p {
+  max-width: 420px;
+  color: var(--fg-dim);
+  font-size: 16px;
+}
+.project-list {
+  border-top: 1px solid var(--line);
+}
+.project {
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  gap: 40px;
+  padding: 48px 0;
+  border-bottom: 1px solid var(--line);
+  align-items: start;
+  cursor: pointer;
+  transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+}
+.project::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; right: 0; bottom: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(197,255,58,0.03) 50%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.5s;
+  pointer-events: none;
+}
+.project:hover::before { opacity: 1; }
+.project:hover { padding-left: 20px; }
+.project:hover .project-title { color: var(--accent); }
+.project:hover .project-arrow { transform: translate(4px, -4px); color: var(--accent); }
+
+.project-num {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--fg-mute);
+  padding-top: 8px;
+}
+.project-content { min-width: 0; }
+.project-title {
+  font-family: var(--serif);
+  font-size: clamp(28px, 3vw, 42px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 14px;
+  transition: color 0.4s;
+}
+.project-desc {
+  color: var(--fg-dim);
+  font-size: 15px;
+  line-height: 1.65;
+  margin-bottom: 18px;
+  max-width: 720px;
+}
+.project-stack {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.project-stack span {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fg-dim);
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+}
+.project-arrow {
+  font-family: var(--serif);
+  font-size: 32px;
+  color: var(--fg-mute);
+  transition: all 0.4s;
+  padding-top: 8px;
+}
+
+/* CONTACT */
+.contact {
+  background: var(--bg-elev);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 160px 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.contact::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(197,255,58,0.08), transparent 60%);
+  pointer-events: none;
+}
+.contact-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  margin-bottom: 32px;
+  position: relative;
+}
+.contact h2 {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: clamp(56px, 10vw, 160px);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  margin-bottom: 40px;
+  position: relative;
+}
+.contact h2 em { font-style: italic; color: var(--accent); font-weight: 400; }
+.contact-email {
+  display: inline-block;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 28px;
+  color: var(--fg);
+  border-bottom: 1px solid var(--fg-mute);
+  padding-bottom: 6px;
+  margin-bottom: 48px;
+  transition: all 0.3s;
+  position: relative;
+}
+.contact-email:hover { color: var(--accent); border-color: var(--accent); }
+.contact-socials {
+  display: flex;
+  gap: 32px;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  position: relative;
+}
+.contact-socials a {
+  color: var(--fg-dim);
+  padding-bottom: 4px;
+  border-bottom: 1px solid transparent;
+  transition: all 0.3s;
+}
+.contact-socials a:hover { color: var(--accent); border-color: var(--accent); }
+
+/* FOOTER */
+footer {
+  padding: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--fg-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+footer .accent { color: var(--accent); }
+
+/* Animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* Reveal on scroll */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.9s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.reveal.in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Responsive */
+@media (max-width: 980px) {
+  .container { padding: 0 24px; }
+  nav { padding: 20px 24px; }
+  .nav-links { gap: 20px; font-size: 10px; }
+  .nav-links a:not(:first-child):not(:last-child) { display: none; }
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 60px;
+    padding: 140px 0 60px;
+  }
+  .hero-image { max-width: 340px; margin: 0 auto; }
+  .about-grid { grid-template-columns: 1fr; gap: 60px; }
+  .skills-wrap { grid-template-columns: 1fr; }
+  .exp-item {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .project {
+    grid-template-columns: 40px 1fr;
+  }
+  .project-arrow { display: none; }
+  section { padding: 100px 0; }
+  .marquee-track { font-size: 20px; gap: 40px; }
+  .marquee-track span { gap: 40px; }
+}
+
+@media (max-width: 560px) {
+  .hero-cta { flex-direction: column; align-items: flex-start; }
+  .btn { width: 100%; justify-content: center; }
+  .contact-socials { flex-direction: column; gap: 16px; }
+  footer { flex-direction: column; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Visal<span>.</span></div>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#skills">Skills</a>
+    <a href="#projects">Work</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero container">
+  <div>
+    <div class="hero-meta">Aspiring AI Engineer — Colombo, Sri Lanka</div>
+    <h1>
+      <span class="block">Visal</span>
+      <span class="block">Chathu<span class="italic">ranga.</span></span>
+    </h1>
+    <p class="hero-desc">
+      I design & ship <strong>AI powered systems</strong>  from RAG based document intelligence and agentic voice assistants, to production grade healthcare platforms. Currently engineering end to end ML pipelines at <strong>MedcubeUSA</strong>.
+    </p>
+    <div class="hero-cta">
+      <a href="#projects" class="btn btn-primary">
+        View Selected Work <span class="arrow">→</span>
+      </a>
+      <a href="#contact" class="btn btn-ghost">
+        Get in Touch <span class="arrow">↗</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="hero-image">
+    <div class="hero-image-wrap">
+      <img src="profile.jpg" alt="Visal Chathuranga" />
+    </div>
+    <div class="hero-image-tag">● Available for work</div>
+  </div>
+</header>
+
+<!-- Marquee -->
+<div class="marquee">
+  <div class="marquee-track">
+    <span>
+      RAG Systems <span class="dot">✦</span>
+      Agentic AI <span class="dot">✦</span>
+      LLM Integration <span class="dot">✦</span>
+      Full-Stack Engineering <span class="dot">✦</span>
+      Healthcare AI <span class="dot">✦</span>
+      Voice Agents <span class="dot">✦</span>
+      Generative Models <span class="dot">✦</span>
+    </span>
+    <span>
+      RAG Systems <span class="dot">✦</span>
+      Agentic AI <span class="dot">✦</span>
+      LLM Integration <span class="dot">✦</span>
+      Full-Stack Engineering <span class="dot">✦</span>
+      Healthcare AI <span class="dot">✦</span>
+      Voice Agents <span class="dot">✦</span>
+      Generative Models <span class="dot">✦</span>
+    </span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about" class="container reveal">
+  <div class="section-label">01 — About</div>
+  <h2 class="section-title">Engineering intelligence <em>into real products.</em></h2>
+
+  <div class="about-grid">
+    <div class="about-text">
+      <p>
+        I'm <strong>Visal Chathuranga</strong>, an AI Engineer from Sri Lanka with a passion for turning cutting-edge research into production-ready systems. I graduated with a B.Sc. in Electrical &amp; Electronic Engineering from the <strong>University of Peradeniya</strong>, earning Second Class Upper Division Honours.
+      </p>
+      <p>
+        My work spans the full stack of modern AI engineering — building RAG pipelines, agentic voice systems, generative models, and healthcare automation tools. I'm certified by <strong>IBM</strong>, <strong>DeepLearning.AI</strong>, and <strong>Coursera</strong> across deep learning, NLP, and computer vision specializations.
+      </p>
+      <p>
+        When I'm not shipping code, you'll find me exploring new frameworks, playing chess, or volunteering with <strong>Arunella</strong>, a social initiative supporting students in underprivileged communities.
+      </p>
+    </div>
+    <div class="about-stats">
+      <div class="stat">
+        <div class="stat-num">20<sup>+</sup></div>
+        <div class="stat-label">Projects Delivered</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">14</div>
+        <div class="stat-label">Certifications</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">2+</div>
+        <div class="stat-label">Years Building AI</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">∞</div>
+        <div class="stat-label">Curiosity</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="experience">
+    <div class="exp-item">
+      <div class="exp-date">SEP 2025 — PRESENT</div>
+      <div class="exp-role">
+        Software Engineer — AI/ML
+        <span class="company">MedcubeUSA</span>
+      </div>
+      <div class="exp-tags">
+        <span class="exp-tag">Full-StackS</span>
+        <span class="exp-tag">RAG</span>
+        <span class="exp-tag">Cloud</span>
+        <span class="exp-tag">GenAI</span>
+        <span class="exp-tag">Agentic AI</span>
+      </div>
+    </div>
+    <div class="exp-item">
+      <div class="exp-date">JUL — OCT 2024</div>
+      <div class="exp-role">
+        AI/ML Engineering Intern
+        <span class="company">GPV Lanka (PVT) Ltd</span>
+      </div>
+      <div class="exp-tags">
+        <span class="exp-tag">Flask</span>
+        <span class="exp-tag">TensorFlow</span>
+        <span class="exp-tag">Python</span>
+      </div>
+    </div>
+    <div class="exp-item">
+      <div class="exp-date">JUL — OCT 2023</div>
+      <div class="exp-role">
+        Automation Engineering Intern
+        <span class="company">Phoenix Industries Ltd</span>
+      </div>
+      <div class="exp-tags">
+        <span class="exp-tag">Computer Vision</span>
+        <span class="exp-tag">Automation</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills" class="container reveal">
+  <div class="section-label">02 — Toolkit</div>
+  <h2 class="section-title">A stack forged from <em>practice, not theory.</em></h2>
+
+  <div class="skills-wrap">
+    <div class="skill-group">
+      <div class="skill-group-label">Languages <span class="skill-group-num">/ 01</span></div>
+      <h3 class="skill-group-title">Programming</h3>
+      <div class="skill-tags">
+        <span>Python</span>
+        <span>TypeScript</span>
+        <span>JavaScript</span>
+        <span>HTML</span>
+        <span>CSS</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-label">AI / ML <span class="skill-group-num">/ 02</span></div>
+      <h3 class="skill-group-title">Intelligence</h3>
+      <div class="skill-tags">
+        <span>TensorFlow</span>
+        <span>Keras</span>
+        <span>LangChain</span>
+        <span>LangGraph</span>
+        <span>HuggingFace</span>
+        <span>OpenAI SDK</span>
+        <span>Scikit-learn</span>
+        <span>NLTK</span>
+        <span>OpenCV</span>
+        <span>MediaPipe</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-label">Web / App <span class="skill-group-num">/ 03</span></div>
+      <h3 class="skill-group-title">Frameworks</h3>
+      <div class="skill-tags">
+        <span>Next.js</span>
+        <span>React</span>
+        <span>Node.js</span>
+        <span>Express.js</span>
+        <span>FastAPI</span>
+        <span>Flask</span>
+        <span>EJS</span>
+        <span>Prisma</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-label">Cloud / Data <span class="skill-group-num">/ 04</span></div>
+      <h3 class="skill-group-title">Infrastructure</h3>
+      <div class="skill-tags">
+        <span>AWS</span>
+        <span>Vercel</span>
+        <span>MongoDB</span>
+        <span>PostgreSQL</span>
+        <span>Pinecone</span>
+        <span>Neo4j</span>
+        <span>Docker</span>
+        <span>Kubernetes</span>
+        <span>DVC</span>
+        <span>MLflow</span>
+        <span>Twilio</span>
+        <span>WebSocket</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects" class="container reveal">
+  <div class="section-label">03 — Selected Work</div>
+  <div class="projects-intro">
+    <h2 class="section-title" style="margin-bottom:0;">Things I've <em>shipped.</em></h2>
+    <p>A curated selection of AI, ML, and full-stack systems — from healthcare intelligence to industrial automation.</p>
+  </div>
+
+  <div class="project-list">
+
+    <a href="https://github.com/Aeliusmd/Docsearch-APP.git" target="_blank" class="project">
+      <div class="project-num">/01</div>
+      <div class="project-content">
+        <h3 class="project-title">DocSearch AI — Legal Document Intelligence</h3>
+        <p class="project-desc">An AI-powered legal document search and Q&amp;A platform built on a RAG pipeline with OpenAI embeddings and Pinecone. Semantic search across case laws, labour codes, and regulations — with real-time WebSocket chat and per-session vector stores.</p>
+        <div class="project-stack">
+          <span>RAG</span><span>Pinecone</span><span>OpenAI</span><span>TypeScript</span><span>PostgreSQL</span>
+        </div>
+      </div>
+      <div class="project-arrow">↗</div>
+    </a>
+
+    <a href="https://github.com/VisalChathuranga/Voice-Agent-Web-Interface" target="_blank" class="project">
+      <div class="project-num">/02</div>
+      <div class="project-content">
+        <h3 class="project-title">AI Voice Agent with RAG &amp; Telephony</h3>
+        <p class="project-desc">A production-ready voice AI system integrating the OpenAI Realtime API with Twilio telephony for natural phone conversations. Dual-mode operation: Full Agentic (RAG + web search + tools) and RAG-Only for compliance-critical industries.</p>
+        <div class="project-stack">
+          <span>OpenAI Realtime</span><span>Twilio</span><span>Pinecone</span><span>Agentic AI</span>
+        </div>
+      </div>
+      <div class="project-arrow">↗</div>
+    </a>
+
+    <a href="https://github.com/VisalChathuranga/EHR-AI-Search.git" target="_blank" class="project">
+      <div class="project-num">/03</div>
+      <div class="project-content">
+        <h3 class="project-title">EHR AI Search — Healthcare Intelligence</h3>
+        <p class="project-desc">An embeddable EHR search platform using GPT-4o Mini with natural language queries, React chat widget, and voice I/O. Integrated with real EHR APIs, deployed as a Vercel widget with FastAPI backend and Playwright-based auto-token refresh.</p>
+        <div class="project-stack">
+          <span>GPT-4o</span><span>FastAPI</span><span>React</span><span>Vercel</span><span>WebSocket</span>
+        </div>
+      </div>
+      <div class="project-arrow">↗</div>
+    </a>
+
+    <a href="https://github.com/VisalChathuranga/voice-to-summary" target="_blank" class="project">
+      <div class="project-num">/04</div>
+      <div class="project-content">
+        <h3 class="project-title">MedScribe Pro — Medical Transcription</h3>
+        <p class="project-desc">A FastAPI platform that converts medical audio into role-labeled transcripts (Doctor / Patient / Nurse) using AWS Transcribe Medical and GPT-4 for clinical summaries. Optimized with S3 Transfer Acceleration, multipart uploads, and speaker diarization.</p>
+        <div class="project-stack">
+          <span>FastAPI</span><span>AWS Transcribe</span><span>GPT-4</span><span>Diarization</span>
+        </div>
+      </div>
+      <div class="project-arrow">↗</div>
+    </a>
+
+    <a href="https://github.com/VisalChathuranga/Petty-Cash-System-via-whatsapp-using-python" target="_blank" class="project">
+      <div class="project-num">/05</div>
+      <div class="project-content">
+        <h3 class="project-title">WhatsApp Petty Cash Management SaaS</h3>
+        <p class="project-desc">A full-stack multi-tenant expense system with a conversational WhatsApp bot, FastAPI (MVC), and a Next.js admin panel. Features AI-powered OCR (AWS Textract + GPT), RBAC, audit logging, and a dynamic rules engine for grade/location-based calculations.</p>
+        <div class="project-stack">
+          <span>WhatsApp API</span><span>FastAPI</span><span>Next.js</span><span>AWS Textract</span><span>Docker</span>
+        </div>
+      </div>
+      <div class="project-arrow">↗</div>
+    </a>
+
+    <a href="https://github.com/VisalChathuranga/Amazon-Textract-Invoice-PDF-Processor-with-LLM.git" target="_blank" class="project">
+      <div class="project-num">/06</div>
+      <div class="project-content">
+        <h3 class="project-title">Textract Invoice Processor (LLM-Enhanced)</h3>
+        <p class="project-desc">A scalable invoice automation pipeline using AWS Textract with S3 integration, MD5 duplicate detection, and intelligent table parsing — achieving 95% accuracy and reducing manual effort by 80%. Enhanced with a Gemini LLM layer for normalization.</p>
+        <div class="project-stack">
+          <span>AWS Textract</span><span>Gemini</span><span>S3</span><span>Python</span>
+        </div>
+      </div>
+      <div class="project-arrow">↗</div>
+    </a>
+
+    <a href="https://github.com/VisalChathuranga/YouTube-Sentiment-Insights-Plugin" target="_blank" class="project">
+      <div class="project-num">/07</div>
+      <div class="project-content">
+        <h3 class="project-title">YouTube Sentiment Insights</h3>
+        <p class="project-desc">An AI-powered Chrome Extension and Flask backend for real-time YouTube comment sentiment analysis. Built with a scalable ML pipeline using DVC, MLflow, and LightGBM, deployed as a Dockerized backend on AWS EC2 with GitHub Actions CI/CD.</p>
+        <div class="project-stack">
+          <span>LightGBM</span><span>Flask</span><span>DVC</span><span>MLflow</span><span>AWS EC2</span>
+        </div>
+      </div>
+      <div class="project-arrow">↗</div>
+    </a>
+
+    <a href="https://github.com/VisalChathuranga/Sentiment-Analysis-Pipeline-using-DVC" target="_blank" class="project">
+      <div class="project-num">/08</div>
+      <div class="project-content">
+        <h3 class="project-title">Sentiment Analysis Pipeline with DVC</h3>
+        <p class="project-desc">An end-to-end ML pipeline for tweet emotion detection achieving 87% accuracy with Gradient Boosting. Fully automated stages via dvc.yaml — data ingestion through evaluation — reducing reruns by 90%.</p>
+        <div class="project-stack">
+          <span>Scikit-learn</span><span>NLTK</span><span>DVC</span><span>Python</span>
+        </div>
+      </div>
+      <div class="project-arrow">↗</div>
+    </a>
+
+    <a href="https://github.com/VisalChathuranga/AI-Based-Desktop-Application-for-Reflow-Oven-Profile-Predictor" target="_blank" class="project">
+      <div class="project-num">/09</div>
+      <div class="project-content">
+        <h3 class="project-title">Reflow Oven Profile Predictor</h3>
+        <p class="project-desc">A hybrid desktop application built with Electron.js and a Python Flask backend, integrating TensorFlow/Keras neural networks to optimize soldering temperature profiles for industrial reflow ovens — delivering measurable quality improvements.</p>
+        <div class="project-stack">
+          <span>Electron.js</span><span>TensorFlow</span><span>Flask</span><span>Keras</span>
+        </div>
+      </div>
+      <div class="project-arrow">↗</div>
+    </a>
+
+    <a href="https://github.com/VisalChathuranga/Visal-CRUD-WebApp.git" target="_blank" class="project">
+      <div class="project-num">/10</div>
+      <div class="project-content">
+        <h3 class="project-title">MERN CRUD Web App</h3>
+        <p class="project-desc">A full-stack MERN application with secure JWT authentication, RESTful APIs, PDF report generation, and a responsive glassmorphism UI with real-time data updates across all devices.</p>
+        <div class="project-stack">
+          <span>MongoDB</span><span>Express</span><span>React</span><span>Node.js</span><span>JWT</span>
+        </div>
+      </div>
+      <div class="project-arrow">↗</div>
+    </a>
+
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="contact">
+  <div class="container">
+    <div class="contact-label">04 — Let's Talk</div>
+    <h2>Have an idea? <em>Let's build it.</em></h2>
+    <a href="mailto:e19056@eng.pdn.ac.lk" class="contact-email">e19056@eng.pdn.ac.lk</a>
+    <div class="contact-socials">
+      <a href="https://github.com/VisalChathuranga" target="_blank">GitHub ↗</a>
+      <a href="https://www.linkedin.com/in/visal-chathuranga/" target="_blank">LinkedIn ↗</a>
+      <a href="tel:+94779485361">+94 77 948 5361 ↗</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>© 2026 Visal Chathuranga — All rights reserved</div>
+  <div>Designed &amp; built with <span class="accent">♥</span> in Sri Lanka</div>
+</footer>
+
+<script>
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('in');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -80px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
