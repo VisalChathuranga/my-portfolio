@@ -361,6 +361,94 @@ nav.scrolled { border-bottom-color: var(--line); padding: 18px 40px; }
 .btn-primary:hover { color: var(--accent); }
 .btn-ghost:hover { color: var(--bg); border-color: var(--accent); }
 
+/* ── NAV RESUME BUTTON (elongated elliptical pill + SVG download icon) ── */
+.nav-cv {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 36px 80px 36px 80px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--accent) !important;
+  background: transparent;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  position: relative;
+  overflow: hidden;
+  transition: color 0.4s var(--ease), background 0.4s var(--ease), border-color 0.4s var(--ease), box-shadow 0.4s var(--ease), transform 0.4s var(--ease);
+  margin-left: 14px;
+  white-space: nowrap;
+  line-height: 1;
+}
+/* Cancel the inherited .nav-links a underline */
+.nav-cv::after { display: none !important; }
+.nav-cv > * { position: relative; z-index: 1; }
+.nav-cv .dl-icon {
+  width: 12px;
+  height: 12px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.4s var(--ease);
+  overflow: visible;
+  transform: translateY(-0.5px);
+  flex-shrink: 0;
+}
+.nav-cv .dl-icon .arrow-body { transition: transform 0.4s var(--ease); }
+.nav-cv:hover {
+  color: var(--bg) !important;
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 28px var(--accent-glow);
+}
+.nav-cv:hover .dl-icon .arrow-body { animation: cvBounce 0.6s var(--ease); }
+@keyframes cvBounce {
+  0%   { transform: translateY(0); }
+  45%  { transform: translateY(2.5px); }
+  100% { transform: translateY(0); }
+}
+
+/* ── HERO CV SUB-LINK (sits below main CTAs, low visual weight) ── */
+.hero-cv-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 22px;
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--fg-dim);
+  padding: 4px 0;
+  border-bottom: 1px solid transparent;
+  transition: color 0.4s var(--ease), border-color 0.4s var(--ease), gap 0.4s var(--ease);
+  opacity: 0;
+  animation: fadeIn 1s var(--ease) 2.5s forwards;
+  width: fit-content;
+}
+.hero-cv-link .dl-arrow {
+  display: inline-block;
+  transition: transform 0.4s var(--ease);
+  color: var(--accent);
+}
+.hero-cv-link .dot-sep {
+  color: var(--fg-mute);
+  font-size: 8px;
+}
+.hero-cv-link:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  gap: 14px;
+}
+.hero-cv-link:hover .dl-arrow {
+  transform: translateY(3px);
+}
+
 .hero-image {
   position: relative;
   opacity: 0;
@@ -989,6 +1077,8 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
   nav.scrolled { padding: 16px 24px; }
   .nav-links { gap: 20px; font-size: 10px; }
   .nav-links a:not(:first-child):not(:last-child) { display: none; }
+  .nav-cv { padding: 26px 56px 26px 56px; font-size: 9.5px; letter-spacing: 0.14em; margin-left: 0; gap: 10px; border-radius: 999px; }
+  .nav-cv .dl-icon { width: 10px; height: 10px; }
   .hero { grid-template-columns: 1fr; gap: 60px; padding: 140px 0 60px; }
   .hero-image { max-width: 340px; margin: 0 auto; }
   .about-grid { grid-template-columns: 1fr; gap: 60px; }
@@ -1791,6 +1881,16 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
     <a href="#projects">Work</a>
     <a href="#notes">Notes</a>
     <a href="#contact">Contact</a>
+    <a href="Visal_Chathuranga_CV.pdf" download="Visal_Chathuranga_CV.pdf" class="nav-cv" aria-label="Download Resume as PDF">
+      <svg class="dl-icon" viewBox="0 0 16 16" aria-hidden="true">
+        <g class="arrow-body">
+          <path d="M8 2.5v8"/>
+          <path d="M4.5 7 8 10.5 11.5 7"/>
+        </g>
+        <path d="M2.5 13.5h11"/>
+      </svg>
+      <span>Resume</span>
+    </a>
   </div>
 </nav>
 
@@ -1819,6 +1919,12 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
         <span class="arrow">↗</span>
       </a>
     </div>
+    <a href="Visal_Chathuranga_CV.pdf" download="Visal_Chathuranga_CV.pdf" class="hero-cv-link" aria-label="Download CV as PDF">
+      <span class="dl-arrow">↓</span>
+      <span>Download Resume</span>
+      <span class="dot-sep">●</span>
+      <span>PDF · 75 KB</span>
+    </a>
   </div>
 
   <div class="hero-image">
@@ -2226,6 +2332,7 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
     <div class="contact-socials">
       <a href="https://github.com/VisalChathuranga" target="_blank">GitHub ↗</a>
       <a href="https://www.linkedin.com/in/visal-chathuranga/" target="_blank">LinkedIn ↗</a>
+      <a href="Visal_Chathuranga_CV.pdf" download="Visal_Chathuranga_CV.pdf">Resume ↓</a>
       <a href="tel:+94779485361">+94 77 948 5361 ↗</a>
     </div>
   </div>
