@@ -3,26 +3,81 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#f7f1e5" />
 <title>Visal Chathuranga — AI Engineer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,ital,wght@9..144,0,300;9..144,0,400;9..144,0,600;9..144,0,900;9..144,1,300;9..144,1,400&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<!-- Dala runs one typeface everywhere. PPNeueMontreal is not free, so the
+     style reference nominates Inter as the substitute; weights 200/400/600
+     carry body / headline / nav exactly as the spec describes. -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- three.js is loaded on demand by the skills globe (see loadThree below).
+     It is ~150KB gzipped and only ever used by that one section, so keeping it
+     out of <head> stops it blocking first paint and skips it entirely on mobile. -->
 <style>
 :root {
-  --bg: #0a0a09;
-  --bg-elev: #12120f;
-  --bg-soft: #161612;
-  --fg: #f2ede1;
-  --fg-dim: #8f8b80;
-  --fg-mute: #55524b;
-  --accent: #c5ff3a;
-  --accent-dim: #8fb825;
-  --accent-glow: rgba(197, 255, 58, 0.18);
-  --line: #23231e;
-  --serif: 'Fraunces', Georgia, serif;
-  --sans: 'Manrope', -apple-system, sans-serif;
-  --mono: 'JetBrains Mono', monospace;
+  color-scheme: light;
+  /* ── Dala palette ──────────────────────────────────────────────────────
+     The cream surface keeps the chromatic accents vivid without sacrificing
+     the legibility of body copy, cards or data visualisations. */
+  --color-void:          #f7f1e5;
+  --color-bone-white:    #ffffff;
+  --color-ash-gray:      #696258;
+  --color-silver-mist:   #625d52;
+  --color-electric-iris: #5c3fa3;
+  --color-saffron-spark: #8a4d00;
+  --color-deep-verdant:  #087566;
+  --tone-lavender:       #eee8f7;
+  --tone-sand:           #f1e2c5;
+  --tone-paper:          #fffaf0;
+
+  /* site-wide aliases (kept so existing rules resolve to the new palette) */
+  --bg: var(--color-void);
+  --bg-rgb: 247, 241, 229;
+  --bg-elev: #fffaf0;
+  --bg-soft: #eee4d3;
+  --fg: #211f1a;
+  --fg-dim: var(--color-silver-mist);
+  --fg-mute: var(--color-ash-gray);
+  --accent: var(--color-electric-iris);
+  --accent-dim: #472d86;
+  --spark: var(--color-saffron-spark);
+  --accent-glow: rgba(92, 63, 163, 0.14);
+
+  /* Quiet sand dividers give light surfaces enough structure. */
+  --line: #d5c9b8;
+
+  /* One typeface across every context. --serif and --mono are kept pointing
+     at the same stack so no rule silently falls back to Georgia. */
+  --sans:  'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --serif: var(--sans);
+  --mono:  'JetBrains Mono', ui-monospace, monospace;
+
+  /* type scale — hierarchy comes from scale and tracking, never weight */
+  --text-caption: 12px;
+  --text-nav-label: 14px;
+  --text-body: 18px;
+  --text-heading-2xs: 24px;
+  --text-heading-xs: 27px;
+  --text-subheading: 36px;
+  --text-heading-sm: 42px;
+  --text-heading: 48px;
+  --text-heading-lg: 78px;
+  --text-display: 113px;
+
+  --w-extralight: 300;
+  --w-regular: 400;
+  --w-semibold: 600;
+
+  /* 6px base unit */
+  --spacing-6: 6px;    --spacing-12: 12px;  --spacing-18: 18px;
+  --spacing-24: 24px;  --spacing-30: 30px;  --spacing-36: 36px;
+  --spacing-60: 60px;  --spacing-96: 96px;  --spacing-120: 120px;
+
+  --page-max-width: 1280px;
+  --radius-3xl: 24px;
+  --radius-full: 9999px;
+
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -32,8 +87,11 @@ body {
   background: var(--bg);
   color: var(--fg);
   font-family: var(--sans);
-  font-weight: 300;
-  line-height: 1.6;
+  /* weight 200 body copy is a Dala signature — most sites use 400 here, and
+     stripping the weight is what makes the paragraphs read as airy. */
+  font-weight: var(--w-extralight);
+  font-size: var(--text-body);
+  line-height: 1.5;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   cursor: none;
@@ -57,7 +115,7 @@ body {
   pointer-events: none;
   z-index: 9999;
   transform: translate(-50%, -50%);
-  mix-blend-mode: difference;
+  mix-blend-mode: normal;
   transition: width 0.3s, height 0.3s;
 }
 .cursor-ring {
@@ -80,10 +138,10 @@ body::before {
   content: '';
   position: fixed; inset: 0;
   pointer-events: none;
-  opacity: 0.04;
+  opacity: 0.025;
   z-index: 90;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' /%3E%3C/svg%3E");
-  mix-blend-mode: overlay;
+  mix-blend-mode: multiply;
 }
 .spotlight {
   position: fixed;
@@ -99,8 +157,39 @@ body::before {
 
 ::selection { background: var(--accent); color: var(--bg); }
 a { color: inherit; text-decoration: none; }
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 30000;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: var(--fg);
+  color: var(--color-bone-white);
+  font-size: 14px;
+  font-weight: 600;
+  transform: translateY(-160%);
+  transition: transform 0.2s var(--ease);
+}
+.skip-link:focus { transform: translateY(0); }
+:where(a, button, input, [tabindex]):focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 4px;
+}
+section[id] { scroll-margin-top: 96px; }
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
 .container {
-  max-width: 1400px;
+  max-width: var(--page-max-width);
   margin: 0 auto;
   padding: 0 40px;
   position: relative;
@@ -195,7 +284,7 @@ nav {
   align-items: center;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  background: rgba(10, 10, 9, 0.5);
+  background: rgba(var(--bg-rgb), 0.5);
   border-bottom: 1px solid transparent;
   transition: border-color 0.4s, padding 0.4s;
 }
@@ -233,6 +322,30 @@ nav.scrolled { border-bottom-color: var(--line); padding: 18px 40px; }
 }
 .nav-links a:hover { color: var(--accent); }
 .nav-links a:hover::after { width: 100%; }
+.nav-toggle {
+  display: none;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--tone-paper);
+  color: var(--fg);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5px;
+}
+.nav-toggle span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform 0.25s var(--ease), opacity 0.2s ease;
+}
+.nav-toggle[aria-expanded="true"] span:first-child { transform: translateY(3.5px) rotate(45deg); }
+.nav-toggle[aria-expanded="true"] span:last-child { transform: translateY(-3.5px) rotate(-45deg); }
 
 /* HERO */
 .hero {
@@ -281,12 +394,14 @@ nav.scrolled { border-bottom-color: var(--line); padding: 18px 40px; }
   to { transform: scaleX(1); }
 }
 .hero h1 {
-  font-family: var(--serif);
-  font-weight: 300;
-  font-size: clamp(56px, 9.5vw, 156px);
-  line-height: 0.98;
+  font-family: var(--sans);
+  /* weight 400 at 113px — the same weight as body text. Dala trusts scale
+     and tracking for hierarchy, so a bold headline would break the system. */
+  font-weight: var(--w-regular);
+  font-size: clamp(52px, 8vw, 113px);
+  line-height: 1.1;
   letter-spacing: -0.04em;
-  margin-bottom: 40px;
+  margin-bottom: var(--spacing-36);
 }
 .hero h1 .line {
   display: block;
@@ -308,10 +423,11 @@ nav.scrolled { border-bottom-color: var(--line); padding: 18px 40px; }
 }
 .hero-desc {
   max-width: 520px;
-  font-size: 17px;
-  color: var(--fg-dim);
-  line-height: 1.7;
-  margin-bottom: 48px;
+  font-size: var(--text-body);
+  font-weight: var(--w-extralight);
+  color: var(--fg);
+  line-height: 1.5;
+  margin-bottom: var(--spacing-36);
   opacity: 0;
   transform: translateY(20px);
   animation: slideUp 1s var(--ease) 2s forwards;
@@ -328,13 +444,14 @@ nav.scrolled { border-bottom-color: var(--line); padding: 18px 40px; }
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  padding: 18px 30px;
-  font-family: var(--mono);
-  font-size: 11px;
+  padding: 14.4px 24px;
+  font-family: var(--sans);
+  font-size: var(--text-nav-label);
+  font-weight: var(--w-semibold);
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  border: 1px solid var(--line);
-  border-radius: 999px;
+  letter-spacing: 0.025em;
+  border: 1px solid transparent;
+  border-radius: var(--radius-3xl);
   transition: all 0.5s var(--ease);
   cursor: none;
   position: relative;
@@ -354,8 +471,10 @@ nav.scrolled { border-bottom-color: var(--line); padding: 18px 40px; }
 .btn:hover::before { transform: translateY(0); }
 .btn:hover .arrow { transform: translate(4px, -4px); }
 .btn-primary {
+  /* Electric Iris is reserved for filled action buttons — it is never a
+     section surface, and never appears twice in the same view. */
   background: var(--accent);
-  color: var(--bg);
+  color: var(--color-bone-white);
   border-color: var(--accent);
 }
 .btn-primary::before { background: var(--bg); }
@@ -367,16 +486,16 @@ nav.scrolled { border-bottom-color: var(--line); padding: 18px 40px; }
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  padding: 36px 80px 36px 80px;
-  font-family: var(--mono);
-  font-size: 10.5px;
-  font-weight: 500;
+  padding: 14.4px 24px;
+  font-family: var(--sans);
+  font-size: var(--text-nav-label);
+  font-weight: var(--w-semibold);
   text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: var(--accent) !important;
-  background: transparent;
+  letter-spacing: 0.025em;
+  color: var(--color-bone-white) !important;
+  background: var(--accent);
   border: 1px solid var(--accent);
-  border-radius: 999px;
+  border-radius: var(--radius-3xl);
   position: relative;
   overflow: hidden;
   transition: color 0.4s var(--ease), background 0.4s var(--ease), border-color 0.4s var(--ease), box-shadow 0.4s var(--ease), transform 0.4s var(--ease);
@@ -563,17 +682,37 @@ nav.scrolled { border-bottom-color: var(--line); padding: 18px 40px; }
 .marquee-track {
   display: inline-flex;
   gap: 60px;
-  animation: scroll 40s linear infinite;
+  /* 40s scrolled the lineup faster than it could be read. The band is
+     ambient texture, not something to keep up with. */
+  animation: marqueeDrift 600s linear infinite;
   font-family: var(--serif);
   font-style: italic;
   font-size: 32px;
   color: var(--fg-dim);
 }
 .marquee:hover .marquee-track { animation-play-state: paused; }
+.marquee.is-paused .marquee-track { animation-play-state: paused !important; }
 .marquee-track span { display: inline-flex; align-items: center; gap: 60px; }
 .marquee-track .item { transition: color 0.3s, transform 0.3s; display: inline-block; }
 .marquee-track .item:hover { color: var(--accent); transform: scale(1.05); }
 .marquee-track .dot { color: var(--accent); font-style: normal; font-size: 24px; }
+.marquee-toggle {
+  position: absolute;
+  right: 18px;
+  bottom: 8px;
+  z-index: 3;
+  min-height: 36px;
+  padding: 7px 12px;
+  border: 1px solid rgba(92, 63, 163, 0.24);
+  border-radius: 999px;
+  background: rgba(255, 250, 240, 0.94);
+  color: var(--fg-dim);
+  font: 600 11px/1 var(--sans);
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.marquee-toggle:hover { color: var(--accent); border-color: var(--accent); }
 
 /* SECTIONS */
 section { padding: 160px 0; position: relative; }
@@ -594,12 +733,12 @@ section { padding: 160px 0; position: relative; }
   background: var(--accent);
 }
 .section-title {
-  font-family: var(--serif);
-  font-weight: 300;
-  font-size: clamp(44px, 6.5vw, 96px);
-  line-height: 1.02;
-  letter-spacing: -0.03em;
-  margin-bottom: 80px;
+  font-family: var(--sans);
+  font-weight: var(--w-regular);
+  font-size: clamp(38px, 5.4vw, 78px);
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  margin-bottom: var(--spacing-60);
   max-width: 900px;
 }
 .section-title em { font-style: italic; color: var(--accent); font-weight: 400; }
@@ -645,15 +784,11 @@ section { padding: 160px 0; position: relative; }
 .about-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0;
-  border-top: 1px solid var(--line);
-  border-left: 1px solid var(--line);
+  gap: var(--spacing-18) var(--spacing-24);
 }
 .stat {
-  padding: 44px 32px;
-  border-right: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  transition: background 0.4s;
+  padding: var(--spacing-30) var(--spacing-36) var(--spacing-30) 0;
+  transition: opacity 0.4s;
   position: relative;
   overflow: hidden;
 }
@@ -931,10 +1066,8 @@ section { padding: 160px 0; position: relative; }
 
 /* CONTACT */
 .contact {
-  background: var(--bg-elev);
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  padding: 180px 0;
+  background: var(--bg);
+  padding: var(--spacing-120) 0;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -1055,7 +1188,7 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
 
 @keyframes slideUp { to { transform: translateY(0); opacity: 1; } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes scroll {
+@keyframes marqueeDrift {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
@@ -1082,14 +1215,63 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
 .reveal-stagger.in > *:nth-child(8) { transition-delay: 0.54s; }
 .reveal-stagger.in > *:nth-child(9) { transition-delay: 0.61s; }
 .reveal-stagger.in > *:nth-child(10) { transition-delay: 0.68s; }
+/* .project-list holds 22 cards; without these the 11th onward all landed at
+   once with no delay while the first ten staggered. */
+.reveal-stagger.in > *:nth-child(11) { transition-delay: 0.75s; }
+.reveal-stagger.in > *:nth-child(12) { transition-delay: 0.82s; }
+.reveal-stagger.in > *:nth-child(13) { transition-delay: 0.89s; }
+.reveal-stagger.in > *:nth-child(14) { transition-delay: 0.96s; }
+.reveal-stagger.in > *:nth-child(15) { transition-delay: 1.03s; }
+.reveal-stagger.in > *:nth-child(16) { transition-delay: 1.10s; }
+.reveal-stagger.in > *:nth-child(17) { transition-delay: 1.17s; }
+.reveal-stagger.in > *:nth-child(18) { transition-delay: 1.24s; }
+.reveal-stagger.in > *:nth-child(19) { transition-delay: 1.31s; }
+.reveal-stagger.in > *:nth-child(20) { transition-delay: 1.38s; }
+.reveal-stagger.in > *:nth-child(21) { transition-delay: 1.45s; }
+.reveal-stagger.in > *:nth-child(n+22) { transition-delay: 1.52s; }
 
 @media (max-width: 980px) {
   .container { padding: 0 24px; }
   nav { padding: 20px 24px; }
   nav.scrolled { padding: 16px 24px; }
-  .nav-links { gap: 20px; font-size: 10px; }
-  .nav-links a:not(:first-child):not(:last-child) { display: none; }
-  .nav-cv { padding: 26px 56px 26px 56px; font-size: 9.5px; letter-spacing: 0.14em; margin-left: 0; gap: 10px; border-radius: 999px; }
+  .nav-toggle { display: inline-flex; }
+  .nav-links {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 16px;
+    right: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background: rgba(255, 250, 240, 0.98);
+    box-shadow: 0 20px 50px rgba(67, 52, 34, 0.16);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-8px);
+    transition: opacity 0.2s ease, transform 0.25s var(--ease), visibility 0.2s;
+  }
+  .nav-links.menu-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+  .nav-links a {
+    display: flex;
+    align-items: center;
+    min-height: 46px;
+    padding: 10px 14px;
+    border-radius: 12px;
+  }
+  .nav-links a:hover,
+  .nav-links a.nav-active { background: var(--tone-lavender); }
+  .nav-links a::after { display: none; }
+  .nav-cv { justify-content: center; padding: 14px 18px; font-size: 11px; letter-spacing: 0.08em; margin-left: 0; gap: 10px; border-radius: 999px; }
   .nav-cv .dl-icon { width: 10px; height: 10px; }
   .hero { grid-template-columns: 1fr; gap: 60px; padding: 140px 0 60px; }
   .hero-image { max-width: 340px; margin: 0 auto; }
@@ -1105,17 +1287,47 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
   .loader-name { font-size: clamp(18px, 7vw, 40px); }
 }
 @media (max-width: 560px) {
+  .container { padding-left: 20px; padding-right: 20px; }
+  nav, nav.scrolled { padding-left: 18px; padding-right: 18px; }
+  .nav-logo { max-width: 210px; font-size: 17px; }
+  .hero h1 { font-size: clamp(42px, 13vw, 56px); }
   .hero-cta { flex-direction: column; align-items: stretch; width: 100%; }
   .btn { width: 100%; justify-content: center; }
   .contact-socials { flex-direction: column; gap: 16px; }
   footer { flex-direction: column; text-align: center; }
   .stat-num { font-size: 56px; }
   .loader-name { font-size: 20px; letter-spacing: 0; }
+  .project { grid-template-columns: 36px minmax(0, 1fr); gap: 16px; padding: 38px 0; }
+  .project-title { font-size: clamp(25px, 8vw, 34px); }
+  .project-desc { font-size: 16px; overflow-wrap: anywhere; }
+  .contact-email { max-width: 100%; overflow-wrap: anywhere; word-break: break-word; }
+  .marquee-toggle { right: 10px; }
 }
 @media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+  .loader { display: none !important; }
+  body { cursor: auto; }
+  .cursor-dot, .cursor-ring, .spotlight { display: none !important; }
+  .marquee-track { animation: none !important; transform: none !important; }
+  .hero-meta,
+  .hero h1 .line > span,
+  .hero-desc,
+  .hero-cta,
+  .hero-cv-link,
+  .hero-image {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+  .reveal,
+  .reveal-stagger > *,
+  .word-reveal .word > span {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 
@@ -1322,7 +1534,7 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
   position: absolute; inset: 0;
   background: repeating-linear-gradient(
     -45deg, transparent, transparent 6px,
-    rgba(255,255,255,0.013) 6px, rgba(255,255,255,0.013) 7px
+    rgba(33,31,26,0.035) 6px, rgba(33,31,26,0.035) 7px
   );
 }
 .cs-shot-icon { position: relative; font-family: var(--serif); font-style: italic; font-size: 22px; color: var(--fg-mute); z-index: 1; }
@@ -1340,6 +1552,13 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
 }
 @media (max-width: 560px) {
   .cs-shots-grid { grid-template-columns: 1fr; }
+  .cs-header { padding: 10px 12px; }
+  .cs-header-num, .cs-header-subtitle { display: none; }
+  .cs-nav-btn, .cs-close { width: 44px; height: 44px; }
+  .cs-nav-count { min-width: 28px; }
+  .cs-body { padding: 24px 18px; }
+  .cs-metrics-grid { grid-template-columns: 1fr; }
+  .cs-stack-node { white-space: normal; overflow-wrap: anywhere; }
 }
 
 /* SCROLL-LINKED HERO NAME
@@ -1450,14 +1669,19 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
   position: relative;
   width: 100%;
   user-select: none;
+  --globe-iris: #5c3fa3;
+  --globe-saffron: #a45f00;
+  --globe-verdant: #087566;
+  --globe-slate: #334653;
 }
 #skillsGlobe {
   width: 100%;
   display: block;
   border: 1px solid var(--line);
+  border-radius: var(--radius-3xl);
   background:
-    radial-gradient(120% 120% at 50% 40%, rgba(197,255,58,0.045) 0%, transparent 55%),
-    var(--bg);
+    radial-gradient(circle at 50% 42%, #fffaf1 0%, #f1e7d6 72%, #e5d8c4 100%);
+  box-shadow: 0 26px 70px rgba(67, 52, 34, 0.10);
   min-height: 600px;
   position: relative;
   overflow: hidden;
@@ -1473,14 +1697,14 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
   pointer-events: none;
   opacity: 0;
   z-index: 5;
-  background: rgba(18,18,15,0.95);
+  background: rgba(33,31,26,0.96);
   border: 1px solid var(--accent);
   border-radius: 8px;
   padding: 10px 13px;
   min-width: 120px;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 0 4px var(--accent-glow);
+  box-shadow: 0 12px 32px rgba(67,52,34,0.24), 0 0 0 4px var(--accent-glow);
   transition: opacity 0.18s var(--ease);
   will-change: transform, opacity;
 }
@@ -1489,7 +1713,7 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
   font-family: var(--serif);
   font-size: 16px;
   letter-spacing: -0.01em;
-  color: var(--fg);
+  color: #fffaf0;
   line-height: 1.1;
   margin-bottom: 5px;
 }
@@ -1508,7 +1732,7 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
   background: var(--accent);
   box-shadow: 0 0 6px var(--accent);
 }
-.globe-tip .gt-years { color: var(--fg-dim); }
+.globe-tip .gt-years { color: #d8d0c3; }
 /* Keyboard-focusable overlay buttons, one per node */
 .constellation-overlays {
   position: absolute;
@@ -1558,13 +1782,17 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
   flex-shrink: 0;
   transition: background 0.3s;
 }
+.constellation-legend span:nth-child(1)::before { background: var(--globe-iris); }
+.constellation-legend span:nth-child(2)::before { background: var(--globe-saffron); }
+.constellation-legend span:nth-child(3)::before { background: var(--globe-verdant); }
+.constellation-legend span:nth-child(4)::before { background: var(--globe-slate); }
 .constellation-hint {
   font-family: var(--mono);
   font-size: 10px;
   color: var(--fg-mute);
   letter-spacing: 0.1em;
   margin-top: 14px;
-  opacity: 0.6;
+  opacity: 0.82;
 }
 /* Mobile tag-list fallback */
 .skill-mobile { display: none; padding: 24px 0 8px; }
@@ -1665,7 +1893,7 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--accent);
-  border: 1px solid rgba(197,255,58,0.3);
+  border: 1px solid rgba(92,63,163,0.30);
   padding: 2px 7px;
   border-radius: 2px;
   align-self: start;
@@ -1684,10 +1912,8 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
 .stats-strip {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  margin-bottom: 72px;
-  overflow: hidden;
+  gap: var(--spacing-24);
+  margin-bottom: var(--spacing-96);
 }
 .strip-stat {
   padding: 40px 32px;
@@ -1700,7 +1926,7 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
 .strip-stat + .strip-stat {
   border-left: 1px solid var(--line);
 }
-.strip-stat:hover { background: rgba(197,255,58,0.04); }
+.strip-stat:hover { background: transparent; }
 .strip-num {
   font-family: var(--serif);
   font-size: clamp(48px, 5.5vw, 80px);
@@ -1746,7 +1972,7 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
 /* ── COMMAND PALETTE ── */
 #cmd-overlay {
   position: fixed; inset: 0;
-  background: rgba(10,10,9,0.72);
+  background: rgba(var(--bg-rgb), 0.72);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   z-index: 20000;
@@ -1765,10 +1991,10 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
 #cmd-box {
   width: 100%;
   max-width: 560px;
-  background: #0f0f0d;
+  background: var(--bg-elev);
   border: 1px solid var(--line);
   border-radius: 6px;
-  box-shadow: 0 32px 80px rgba(0,0,0,0.72), 0 0 0 1px rgba(197,255,58,0.06);
+  box-shadow: 0 32px 80px rgba(67,52,34,0.24), 0 0 0 1px rgba(92,63,163,0.10);
   overflow: hidden;
   transform: translateY(-12px) scale(0.98);
   transition: transform 0.22s var(--ease);
@@ -1802,6 +2028,7 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
   line-height: 1;
 }
 #cmd-input::placeholder { color: var(--fg-mute); }
+#cmd-input:focus-visible { outline: none; }
 #cmd-kbd-hint {
   font-size: 10px;
   color: var(--fg-mute);
@@ -1830,7 +2057,7 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
 }
 .cmd-item:hover,
 .cmd-item.active {
-  background: rgba(197,255,58,0.06);
+  background: rgba(92,63,163,0.075);
 }
 .cmd-item.active .cmd-label { color: var(--accent); }
 .cmd-icon {
@@ -1861,6 +2088,13 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
   border: 1px solid var(--line);
   padding: 2px 6px;
   border-radius: 3px;
+}
+@media (max-width: 640px) {
+  #cmd-overlay { padding: 12vh 14px 20px; }
+  #cmd-box { max-height: calc(100vh - 24vh - 20px); }
+  #cmd-kbd-hint, #cmd-footer { display: none; }
+  #cmd-list { max-height: min(55vh, 380px); }
+  .cmd-item { min-height: 48px; }
 }
 #cmd-footer {
   border-top: 1px solid var(--line);
@@ -1918,6 +2152,385 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   DALA STYLE LAYER
+   Appended last so it wins over the rules above without having to unpick
+   them. Everything here comes straight from the style reference: the void
+   is the design, hierarchy is scale + tracking, one violet pill, no cards.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── No elevation. Ever. A shadow would break the floating-in-space quality
+      that the whole system depends on. ────────────────────────────────── */
+.project, .exp-item, .stat, .strip-stat, .note-item, .stats-strip,
+.about-stats, .skill-mobile-cat, .marquee, .contact, .hero-image-wrap {
+  box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
+  border-radius: 0;
+}
+
+/* ── Type: one family, three weights ──────────────────────────────────── */
+h1, h2, h3, h4, .section-title, .project-title, .cs-header-title,
+.stat-num, .strip-num, .contact-email, .nav-logo, .loader-name {
+  font-family: var(--sans);
+  font-weight: var(--w-regular);
+  letter-spacing: -0.04em;
+}
+p, .project-desc, .note-desc, .about-text p, .cs-section-text {
+  font-weight: var(--w-extralight);
+  font-size: var(--text-body);
+  line-height: 1.5;
+}
+
+/* Italic serif was the old brand's gesture. Dala has no italics — emphasis
+   is carried by the amber spark instead. */
+em, i, .italic, .section-title em, .hero h1 .italic, h2 em, .contact-email {
+  font-style: normal !important;
+}
+.hero h1 .italic, .section-title em, h2 em { color: var(--accent); }
+
+/* ── Labels: uppercase 14/600 with 0.025em tracking, in amber ─────────── */
+.section-label, .contact-label, .hero-meta, .exp-date, .note-date,
+.cs-section-label, .cs-shots-label, .constellation-hint, footer, .marquee {
+  font-family: var(--sans) !important;
+  font-size: var(--text-nav-label);
+  font-weight: var(--w-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+.section-label, .contact-label, .cs-section-label { color: var(--spark); }
+.exp-date, .note-date, .constellation-hint, footer { color: var(--fg-mute); }
+
+/* ── Nav: transparent, sitting directly on the void. No blur, no border ── */
+nav {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-bottom: none !important;
+}
+.nav-links a {
+  font-family: var(--sans);
+  font-size: var(--text-nav-label);
+  font-weight: var(--w-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  color: var(--fg-mute);
+}
+.nav-links a:hover, .nav-links a.active { color: var(--fg); }
+.nav-cv, .nav-cv:hover { color: var(--color-bone-white) !important; }
+.nav-logo { font-weight: var(--w-semibold); font-size: 20px; letter-spacing: -0.02em; }
+.nav-logo span { color: var(--accent); }
+
+/* ── The violet pill is singular. The second CTA is a ghost text link. ─── */
+.btn-ghost, .btn-ghost:hover {
+  background: transparent !important;
+  border-color: transparent !important;
+  color: var(--fg) !important;
+  padding-left: 0;
+  padding-right: 0;
+}
+.btn-primary:hover { background: var(--accent-dim); border-color: var(--accent-dim); }
+
+/* ── Spacing rhythm: 60–120px between sections, spacious by default ───── */
+section { padding: var(--spacing-120) 0; }
+.hero { padding: 180px 0 var(--spacing-96); gap: var(--spacing-60); }
+.marquee { margin-top: 0; padding: var(--spacing-36) 0; }
+
+/* ── Rows float on the void: whitespace separates them, not rules ─────── */
+.project { padding: var(--spacing-60) 0; gap: var(--spacing-36); }
+.exp-item { padding: var(--spacing-36) 0; gap: var(--spacing-36); }
+.note-item { padding: var(--spacing-30) 0; }
+.project:hover, .exp-item:hover, .note-item:hover { background: transparent !important; }
+.project:hover .project-title { color: var(--accent); }
+.project-num, .strip-num, .stat-num { color: var(--accent); }
+.project-arrow { color: var(--spark); }
+
+/* ── Tags are the one place a fill is allowed: pills, no border ───────── */
+.project-stack span, .exp-tag, .skill-mobile-tags span, .note-tag,
+.cs-stack-flow > *, .constellation-legend span {
+  font-family: var(--sans) !important;
+  font-size: var(--text-caption);
+  font-weight: var(--w-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  border-radius: var(--radius-full) !important;
+  border: none !important;
+  background: rgba(92, 63, 163, 0.12) !important;
+  color: var(--fg) !important;
+  padding: 6px 12px !important;
+}
+
+/* ── Numbers: display scale, violet ──────────────────────────────────── */
+.stat-num, .strip-num {
+  font-size: var(--text-heading-sm);
+  font-weight: var(--w-regular);
+  letter-spacing: -1.68px;
+}
+.stat-label, .strip-label {
+  font-family: var(--sans);
+  font-size: var(--text-caption);
+  font-weight: var(--w-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  color: var(--fg-mute);
+}
+
+/* ── Contact: the email is a headline, not a link ─────────────────────── */
+.contact-email {
+  font-size: clamp(28px, 4.4vw, 78px);
+  font-weight: var(--w-regular);
+  letter-spacing: -0.04em;
+  color: var(--fg);
+}
+.contact-email:hover { color: var(--accent); }
+.contact-socials a {
+  font-family: var(--sans);
+  font-size: var(--text-nav-label);
+  font-weight: var(--w-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  color: var(--fg-mute);
+}
+.contact-socials a:hover { color: var(--spark); }
+
+/* ── Overlay + palette keep 24px radius, still no borders ─────────────── */
+.cs-overlay, .cs-inner { background: var(--bg) !important; }
+#cmd-box { border-radius: var(--radius-3xl); border: none; }
+.cs-shots-grid > * { border-radius: var(--radius-3xl); }
+
+/* ── Hero portrait moved out of the hero (Dala allows no photography
+      there) and re-homed in About, where portraits are permitted. ─────── */
+.about-portrait {
+  border-radius: var(--radius-3xl);
+  overflow: hidden;
+  margin-bottom: var(--spacing-30);
+  max-width: 320px;
+}
+.about-portrait img { display: block; width: 100%; height: auto; }
+
+/* ── Hero constellation canvas ────────────────────────────────────────── */
+.hero-constellation {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  min-height: 380px;
+}
+#heroConstellation {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  /* it is draggable, so it must take the pointer */
+  pointer-events: auto;
+  touch-action: none;
+}
+.hero-constellation-hint {
+  position: absolute;
+  left: 0; right: 0; bottom: -6px;
+  text-align: center;
+  font-family: var(--sans);
+  font-size: var(--text-caption);
+  font-weight: var(--w-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  color: var(--fg-mute);
+  pointer-events: none;
+  opacity: 0.75;
+}
+/* The old WebGL fluid was a gradient wash; Dala's palette is flat and
+   gradients belong only to the logo and the particle field. */
+#heroShader { display: none !important; }
+
+@media (max-width: 980px) {
+  section { padding: var(--spacing-60) 0; }
+  .hero { padding: 140px 0 var(--spacing-60); }
+  .stats-strip { grid-template-columns: 1fr 1fr; }
+}
+
+
+/* ── Hero label takes the amber spark, per the reference's hero recipe ── */
+.hero-meta { color: var(--spark) !important; }
+.hero-meta .pulse { background: var(--spark) !important; }
+
+/* ── Resume link under the CTAs: nav-label type, not mono ─────────────── */
+.hero-cv-link {
+  font-family: var(--sans) !important;
+  font-size: var(--text-nav-label) !important;
+  font-weight: var(--w-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  color: var(--fg-mute) !important;
+}
+.hero-cv-link:hover { color: var(--fg) !important; }
+
+/* ── "Available for work" floats on the void: no box around it ────────── */
+.hero-image-tag {
+  border: none !important;
+  background: transparent !important;
+  font-family: var(--sans) !important;
+  font-size: var(--text-caption);
+  font-weight: var(--w-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  color: var(--fg-mute) !important;
+  padding: 0 !important;
+}
+
+/* ── Marquee: type only, no rules above and below ─────────────────────── */
+.marquee { background: transparent !important; }
+.marquee-track .item { font-weight: var(--w-regular); }
+.marquee-track .dot { color: var(--accent); }
+
+/* ── Field notes band shares the void ─────────────────────────────────── */
+.field-notes { background: var(--bg) !important; }
+.note-title { font-weight: var(--w-regular); font-size: var(--text-heading-2xs); letter-spacing: -0.48px; }
+
+/* ── Project rows: title at subheading scale, number in violet ────────── */
+.project-title { font-size: var(--text-subheading); font-weight: var(--w-regular); letter-spacing: -0.04em; }
+.project-num { font-family: var(--sans); font-size: var(--text-nav-label); font-weight: var(--w-semibold); letter-spacing: 0.025em; }
+
+/* ── Skills globe tooltip ─────────────────────────────────────────────── */
+.globe-tip {
+  background: transparent !important;
+  border: none !important;
+  font-family: var(--sans) !important;
+  font-weight: var(--w-semibold);
+  color: var(--fg) !important;
+}
+
+
+/* ── Word-reveal words carried a 0.2em margin AND the HTML whitespace,
+      which at 78px opened ~48px gaps between words. The reveal still needs
+      horizontal padding so descenders are not clipped, just far less. ──── */
+.word-reveal .word { margin-right: 0 !important; padding-left: 0.03em; padding-right: 0.03em; }
+.word-reveal { word-spacing: -0.06em; }
+
+/* ── Dala has no italics anywhere: emphasis is the violet accent or the
+      amber spark, never a slant. Sweeps up every remaining italic rule. ── */
+.loader-name span, .hero h1 .italic, .marquee-track, .section-title em,
+.skill-group-num, .contact h2 em, .contact-email, .cs-shot-icon,
+.skill-mobile-label, .note-title, .note-title em {
+  font-style: normal !important;
+}
+
+/* THREE-TONE EDITORIAL THEME
+   Cream carries the main narrative, lavender separates reflective content,
+   and sand gives technical / action sections a warmer visual anchor. */
+nav.scrolled {
+  background: rgba(var(--bg-rgb), 0.88) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-bottom: 1px solid rgba(92, 63, 163, 0.12) !important;
+}
+
+.marquee {
+  background: var(--tone-sand) !important;
+  border-top: 1px solid rgba(164, 95, 0, 0.16) !important;
+  border-bottom: 1px solid rgba(164, 95, 0, 0.16) !important;
+}
+.marquee-track {
+  animation-name: marqueeDrift !important;
+  animation-duration: 600s !important;
+  animation-timing-function: linear !important;
+  animation-iteration-count: infinite !important;
+  will-change: transform;
+}
+
+#about,
+#skills {
+  width: min(calc(100% - 48px), var(--page-max-width));
+  border: 1px solid var(--line);
+  border-radius: 36px;
+  padding-left: clamp(24px, 4vw, 56px);
+  padding-right: clamp(24px, 4vw, 56px);
+  margin-top: 24px;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+#about { background: var(--tone-lavender); }
+#skills { background: var(--tone-sand); }
+
+.about-stats {
+  gap: 12px;
+  border: none !important;
+  background: transparent !important;
+}
+.stat,
+.strip-stat {
+  background: rgba(255, 250, 240, 0.68) !important;
+  border: 1px solid rgba(92, 63, 163, 0.12) !important;
+  border-radius: 20px !important;
+}
+.stats-strip { gap: 14px; }
+.strip-stat:nth-child(even) { background: rgba(238, 232, 247, 0.72) !important; }
+
+.project,
+.exp-item {
+  border-bottom: 1px solid var(--line) !important;
+}
+.project:hover,
+.exp-item:hover {
+  background: rgba(238, 232, 247, 0.72) !important;
+  border-radius: 20px;
+}
+
+.field-notes { background: var(--tone-lavender) !important; }
+.notes-list { display: grid; gap: 12px; }
+.note-item {
+  background: rgba(255, 250, 240, 0.68) !important;
+  border: 1px solid rgba(92, 63, 163, 0.12) !important;
+  border-radius: 20px !important;
+  padding: 30px !important;
+}
+.note-item:hover { background: var(--tone-paper) !important; }
+
+.contact {
+  background: var(--tone-sand) !important;
+  border-top: 1px solid rgba(164, 95, 0, 0.16) !important;
+  border-bottom: 1px solid rgba(164, 95, 0, 0.16) !important;
+}
+footer {
+  background: var(--tone-lavender);
+  border-top: 1px solid rgba(92, 63, 163, 0.12);
+}
+
+.globe-tip {
+  background: rgba(33, 31, 26, 0.96) !important;
+  border: 1px solid var(--accent) !important;
+  color: #fffaf0 !important;
+}
+
+@media (max-width: 768px) {
+  #about,
+  #skills {
+    width: calc(100% - 24px);
+    border-radius: 24px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .note-item { padding: 24px !important; }
+}
+
+/* Final UX and accessibility refinements. */
+@media (hover: hover) and (pointer: fine) {
+  a, button { cursor: none; }
+}
+@media (hover: none), (pointer: coarse) {
+  a, button { cursor: pointer; }
+  .project:hover { padding-left: 0; }
+}
+.project:focus-visible {
+  border-radius: 18px;
+  box-shadow: 0 0 0 4px var(--accent-glow);
+}
+.contact-socials a { min-height: 44px; display: inline-flex; align-items: center; }
+.contact-email { overflow-wrap: anywhere; }
+.cs-nav-btn, .cs-close { min-width: 44px; min-height: 44px; cursor: pointer; }
+.cs-header-link { min-height: 44px; display: inline-flex; align-items: center; cursor: pointer; }
+.loader.hide { display: none; }
+
 </style>
 </head>
 <body>
@@ -1963,7 +2576,7 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
   <canvas id="heroCanvas" aria-hidden="true"></canvas>
   <div>
     <div class="hero-meta">
-      Aspiring AI Engineer — Colombo, Sri Lanka
+      AI/ML Engineer — Colombo, Sri Lanka
       <span class="pulse"></span>
     </div>
     <h1>
@@ -1987,17 +2600,16 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
       <span class="dl-arrow">↓</span>
       <span>Download Resume</span>
       <span class="dot-sep">●</span>
-      <span>PDF · 75 KB</span>
+      <span>PDF · 210 KB</span>
     </a>
   </div>
 
-  <div class="hero-image">
-    <div class="hero-image-wrap" id="heroImage">
-      <img src="profile.jpg" alt="Visal Chathuranga" />
-      <div class="hero-image-corner tl">◤ VC.01</div>
-      <div class="hero-image-corner tr">2026 ◥</div>
-      <div class="hero-image-corner br">LK ◢</div>
-    </div>
+  <!-- Dala allows no photography in the hero: the particle constellation is
+       the brand's only hero imagery. The portrait is re-homed in About,
+       where the system does permit portraits. -->
+  <div class="hero-constellation">
+    <canvas id="heroConstellation" aria-hidden="true"></canvas>
+    <div class="hero-constellation-hint">Drag to rotate</div>
     <div class="hero-image-tag">Available for work</div>
   </div>
 </header>
@@ -2039,8 +2651,15 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
 
   <div class="about-grid">
     <div class="about-text">
+      <div class="about-portrait" id="heroImage">
+        <picture>
+          <source srcset="profile.webp" type="image/webp" />
+          <img src="profile.jpg" alt="Visal Chathuranga" width="900" height="1200"
+               fetchpriority="high" decoding="async" />
+        </picture>
+      </div>
       <p>
-        I'm <strong>Visal Chathuranga</strong>. I grew up in Sri Lanka, studied Electrical &amp; Electronic Engineering at the <strong>University of Peradeniya</strong>, and somewhere along the way got completely pulled into AI. Graduated with Second Class Upper Honours, though the projects outside lectures taught me more.
+        I'm <strong>Visal Chathuranga</strong>. I grew up in Sri Lanka, studied Electrical &amp; Electronic Engineering at the <strong>University of Peradeniya</strong>, and somewhere along the way got completely pulled into AI. Graduated with Second Class Upper Honours (GPA 3.4/4.0), though the projects outside lectures taught me more.
       </p>
       <p>
         These days I'm building RAG pipelines, agentic voice systems, and healthcare automation tools. I've shipped across the full stack, from model training to the UI people actually use. I hold certifications from <strong>IBM</strong>, <strong>DeepLearning.AI</strong>, and <strong>Coursera</strong> in deep learning, NLP, and computer vision.
@@ -2051,7 +2670,7 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
     </div>
     <div class="about-stats">
       <div class="stat">
-        <div class="stat-num" data-count="20" data-suffix="+">0+</div>
+        <div class="stat-num" data-count="25" data-suffix="+">0+</div>
         <div class="stat-label">Projects Delivered</div>
       </div>
       <div class="stat">
@@ -2132,14 +2751,16 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
       <div class="skill-mobile-cat">
         <div class="skill-mobile-label">— Languages</div>
         <div class="skill-mobile-tags">
-          <span>Python</span><span>TypeScript</span><span>JavaScript</span><span>HTML</span><span>CSS</span>
+          <span>Python</span><span>TypeScript</span><span>JavaScript</span><span>SQL</span>
+          <span>Bash / PowerShell</span><span>HTML</span><span>CSS</span>
         </div>
       </div>
       <div class="skill-mobile-cat">
         <div class="skill-mobile-label">— AI / ML</div>
         <div class="skill-mobile-tags">
-          <span>TensorFlow</span><span>Keras</span><span>LangChain</span><span>LangGraph</span>
+          <span>TensorFlow</span><span>Keras</span><span>PyTorch</span><span>LangChain</span><span>LangGraph</span>
           <span>HuggingFace</span><span>OpenAI SDK</span><span>Scikit-learn</span><span>NLTK</span>
+          <span>LightGBM</span><span>timm</span><span>Albumentations</span>
           <span>OpenCV</span><span>MediaPipe</span>
         </div>
       </div>
@@ -2147,14 +2768,16 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
         <div class="skill-mobile-label">— Web / App</div>
         <div class="skill-mobile-tags">
           <span>Next.js</span><span>React</span><span>Node.js</span><span>Express.js</span>
-          <span>FastAPI</span><span>Flask</span><span>EJS</span><span>Prisma</span>
+          <span>FastAPI</span><span>Flask</span><span>EJS</span><span>Electron.js</span>
+          <span>Prisma</span><span>Drizzle ORM</span><span>SQLAlchemy</span>
         </div>
       </div>
       <div class="skill-mobile-cat">
         <div class="skill-mobile-label">— Cloud / Data</div>
         <div class="skill-mobile-tags">
           <span>AWS</span><span>Vercel</span><span>MongoDB</span><span>PostgreSQL</span>
-          <span>Pinecone</span><span>Neo4j</span><span>Docker</span><span>Kubernetes</span>
+          <span>SQL Server</span><span>Pinecone</span><span>Qdrant</span><span>ChromaDB</span>
+          <span>Neo4j</span><span>Docker</span><span>Kubernetes</span><span>GitHub Actions</span>
           <span>DVC</span><span>MLflow</span><span>Twilio</span><span>WebSocket</span>
         </div>
       </div>
@@ -2181,8 +2804,8 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
   <!-- STATS STRIP -->
   <div class="stats-strip reveal">
     <div class="strip-stat">
-      <div class="strip-num" data-count="20" data-suffix="+">0</div>
-      <div class="strip-label">Projects Shipped</div>
+      <div class="strip-num" data-count="22" data-suffix="">0</div>
+      <div class="strip-label">Projects Featured</div>
     </div>
     <div class="strip-stat">
       <div class="strip-num" data-count="3" data-suffix="+">0</div>
@@ -2203,56 +2826,152 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
     <a href="https://github.com/VisalChathuranga/apex-multiagent-team" target="_blank" class="project">
       <div class="project-num">/01</div>
       <div class="project-content">
-        <h3 class="project-title">APEX Team — Self Coordinating 14-Agent AI Dev System</h3>
-        <p class="project-desc">A self coordinating AI engineering team that spawns 14 specialist agents (Architect, Backend, Frontend, DBA, AI-Integrator, Tester, Security-Auditor, Pen-Tester, DFIR-Analyst, Reviewer, Perf-Tuner, Writer, DevOps, PM) from a single command, sharing a file-locked shared_state.json verified at 200 concurrent writes with zero data loss. A unified 81 tool MCP server with a 4 layer intelligence stack token budgeting, shared brain summaries, and skill routing across 2,195+ skills achieves 30–70% token reduction via hash based prompt caching. Ships a 3 agent security suite, a 6 stage structured-debate engine, crash recovery with auto backup, and a dark themed FastAPI + WebSocket dashboard with multi-CLI support (Claude Code / Codex / Gemini / Cursor).</p>
+        <h3 class="project-title">APEX Team &mdash; Self Coordinating 14-Agent AI Dev System</h3>
+        <p class="project-desc">A self coordinating AI engineering team that spawns 14 specialist agents (Architect, Backend, Frontend, DBA, AI-Integrator, Tester, Security-Auditor, Pen-Tester, DFIR-Analyst, Reviewer, Perf-Tuner, Writer, DevOps, PM) from a single command, sharing a file-locked state file verified at 200 concurrent writes with zero data loss. A unified 81 tool MCP server with token budgeting, shared brain summaries and skill routing across 2,195 skills achieves 30&ndash;70% token reduction through hash based prompt caching. Ships a 3 agent security suite, a 6 stage structured debate engine, crash recovery with auto backup, and a dark themed FastAPI + WebSocket dashboard with multi-CLI support.</p>
         <div class="project-stack">
-          <span>Python</span><span>FastAPI</span><span>Next.js 14</span><span>MCP × 81</span><span>WebSocket</span><span>MITRE ATT&amp;CK</span>
+          <span>Python</span><span>FastAPI</span><span>Next.js 14</span><span>MCP &times; 81</span><span>WebSocket</span><span>MITRE ATT&amp;CK</span>
+        </div>
+      </div>
+      <div class="project-arrow">↗</div>
+    </a>
+
+    <a href="https://github.com/VisalChathuranga/agent-cortex" target="_blank" class="project">
+      <div class="project-num">/02</div>
+      <div class="project-content">
+        <h3 class="project-title">Agent Cortex &mdash; Long Term Memory Service for AI Agents</h3>
+        <p class="project-desc">An open source, self hosted memory server that lets AI agents remember things between sessions. It exposes 22 MCP tools, 49 REST endpoints and 35 CLI commands over a plain Markdown vault, with Qdrant acting as a search index that can be rebuilt at any time. Retrieval combines dense vectors with a keyword ranker written from scratch, fused through Reciprocal Rank Fusion and reordered by how useful and how often used each memory has been. Runs entirely on CPU, so nothing leaves the machine.</p>
+        <div class="project-stack">
+          <span>Python</span><span>FastAPI</span><span>Qdrant</span><span>fastembed</span><span>MCP</span><span>BM25 + RRF</span>
         </div>
       </div>
       <div class="project-arrow">↗</div>
     </a>
 
     <a href="#" class="project">
-      <div class="project-num">/02</div>
+      <div class="project-num">/03</div>
       <div class="project-content">
-        <h3 class="project-title">Build Orchestrator — 17 Agent AI Dev System</h3>
-        <p class="project-desc">A 17 agents, 7 phase build orchestration system for Claude Code with 3 always on optimization layers token cost manager, skill advisor, and prompt engineer  achieving 30–70% token reduction per session. Integrates 2,195+ skills across dual libraries, a 3 agents security suite mapped to MITRE ATT&CK and NIST CSF 2.0, 20 MCP servers with per agent allowlists, and 5 slash commands fully cross platform.</p>
+        <h3 class="project-title">Agentic Case Search &mdash; Natural Language Over Legal Case Data</h3>
+        <p class="project-desc">A chat widget that turns plain English questions into real API calls across a 22 tool registry, embedded inside a legal case management platform. A three stage router narrows the tool list before the model runs, so the agent is shown at most 8 tools per request instead of all 22. Dates, staff roles and result counts are computed on the server and injected as verified facts, and a whitelist blocks filters the model invents.</p>
         <div class="project-stack">
-          <span>Claude Code</span><span>LangGraph</span><span>MCP × 20</span><span>MITRE ATT&CK</span><span>Python</span><span>YAML</span>
+          <span>Next.js 15</span><span>Vercel AI SDK</span><span>GPT-4o mini</span><span>MongoDB</span><span>Vector Stores</span>
         </div>
       </div>
       <div class="project-arrow">↗</div>
     </a>
 
     <a href="https://github.com/VisalChathuranga/VScanMail" target="_blank" class="project">
-      <div class="project-num">/03</div>
+      <div class="project-num">/04</div>
       <div class="project-content">
-        <h3 class="project-title">VScanMail — AI-Powered Digital Mail Custodian SaaS</h3>
-        <p class="project-desc">A multi tenant SaaS platform for scanned mail processing, cheque validation, delivery requests, and deposit batch management with role based access control. GPT-4o Vision and AWS Textract power extraction, tamper detection, signature verification, and smart validation with Stripe subscription billing, 2FA auth, and audit logs.</p>
+        <h3 class="project-title">VScanMail &mdash; AI Powered Digital Mail Custodian SaaS</h3>
+        <p class="project-desc">A multi tenant SaaS for scanned mail and cheques where every client company gets its own database table, so records cannot leak between tenants. Admin views fan out across all tenant tables at query time and still work when older tables have fewer columns. GPT-4o Vision reads cheques, spots opened envelopes and flags returned cheques, while the final decisions stay in plain code. Bank account numbers are encrypted with a hashed index so an account can be found without decrypting it.</p>
         <div class="project-stack">
-          <span>Next.js</span><span>GPT-4o Vision</span><span>AWS Textract</span><span>Stripe</span><span>MySQL</span><span>RBAC</span>
+          <span>Next.js 15</span><span>GPT-4o Vision</span><span>MySQL</span><span>Stripe</span><span>AES-256-GCM</span><span>TOTP</span>
         </div>
       </div>
       <div class="project-arrow">↗</div>
     </a>
 
     <a href="https://github.com/Aeliusmd/Docsearch-APP.git" target="_blank" class="project">
-      <div class="project-num">/04</div>
+      <div class="project-num">/05</div>
       <div class="project-content">
-        <h3 class="project-title">DocSearch AI — Legal Document Intelligence</h3>
-        <p class="project-desc">An AI powered legal document search and Q&amp;A platform built on a RAG pipeline with OpenAI embeddings and Pinecone. Semantic search across case laws, labour codes, and regulations with real time WebSocket chat and per session vector stores.</p>
+        <h3 class="project-title">DocSearch AI &mdash; Legal Document Intelligence</h3>
+        <p class="project-desc">A legal document search and question answering platform where retrieval uses both meaning and exact wording. Pinecone vector results and an in process keyword index are merged with Reciprocal Rank Fusion, with a SQL phrase search as a final fallback. Every citation has to be provable: the model must quote its source word for word, and if that quote is not in the retrieved pages the citation is stripped. Text position ranges saved with each vector highlight the exact answer inside the PDF viewer.</p>
         <div class="project-stack">
-          <span>RAG</span><span>Pinecone</span><span>OpenAI</span><span>TypeScript</span><span>PostgreSQL</span>
+          <span>RAG</span><span>Pinecone</span><span>MiniSearch</span><span>GPT-4o mini</span><span>PDF.js</span><span>TypeScript</span>
+        </div>
+      </div>
+      <div class="project-arrow">↗</div>
+    </a>
+
+    <a href="#" class="project">
+      <div class="project-num">/06</div>
+      <div class="project-content">
+        <h3 class="project-title">DxScript eRx &mdash; Multi Agent HL7 Prescription Pipeline</h3>
+        <p class="project-desc">A three agent pipeline that reads HL7 prescription files dropped by an e-prescribing vendor and writes each one into the correct clinic database. It has handled 14,162 messages across 6 clinic sites. An ingestion agent watches the shared folder and parses, a routing agent walks a seven step resolution chain and builds each clinic's database connection at run time, and a monitoring agent runs both inside the pipeline and on its own thread so each side checks the other is alive.</p>
+        <div class="project-stack">
+          <span>Python</span><span>LangGraph</span><span>HL7 v2.3</span><span>SQL Server</span><span>Windows Service</span>
+        </div>
+      </div>
+      <div class="project-arrow">↗</div>
+    </a>
+
+    <a href="#" class="project">
+      <div class="project-num">/07</div>
+      <div class="project-content">
+        <h3 class="project-title">EDI 835 ERA Platform &mdash; Insurance Payment Ingestion</h3>
+        <p class="project-desc">An X12 835 parser written from scratch that reads insurance remittance files, handles 17 segment types, works out the file delimiters from the header rather than assuming them, and explains every adjustment against 1,434 standard reason codes. An always on service pulls files from two clearing houses over SFTP, enriches each claim through the billing system and stores the result. It has saved 11,634 payment records from 108 files and matched invoices for 98% of them.</p>
+        <div class="project-stack">
+          <span>Python</span><span>FastAPI</span><span>X12 EDI</span><span>MongoDB</span><span>SFTP</span><span>Next.js</span>
+        </div>
+      </div>
+      <div class="project-arrow">↗</div>
+    </a>
+
+    <a href="#" class="project">
+      <div class="project-num">/08</div>
+      <div class="project-content">
+        <h3 class="project-title">Immunization Registry Submission Service</h3>
+        <p class="project-desc">A read only background service that extracts vaccination doses from seven clinic databases, builds HL7 v2.5.1 VXU messages and submits them to a state immunization registry over the CDC IIS SOAP interface. The design stance is that it never guesses: a dose missing a vaccine code or a clinical sign off is parked with a named status and surfaced to a person, rather than sent with an inferred value. Idempotency is a unique database index, not application logic. Foundation and validation shipped; live submission was blocked on state credentials.</p>
+        <div class="project-stack">
+          <span>Python</span><span>HL7 v2.5.1</span><span>SOAP 1.2</span><span>SQL Server</span><span>CDC Code Sets</span>
+        </div>
+      </div>
+      <div class="project-arrow">↗</div>
+    </a>
+
+    <a href="#" class="project">
+      <div class="project-num">/09</div>
+      <div class="project-content">
+        <h3 class="project-title">Document Classification Pipeline &mdash; OCR and GPT Filing</h3>
+        <p class="project-desc">A two tier parallel pipeline that OCRs scanned legal documents, classifies them with GPT against a 16 type taxonomy fetched per firm at run time, extracts case entities, and cross checks the model's label against three separate case management APIs before filing. Long lived worker processes each fan documents across a thread pool, reusing heavy OCR and model imports instead of paying cold start on every batch, and recycle after 50 batches to bound native memory growth.</p>
+        <div class="project-stack">
+          <span>Python</span><span>GPT-4.1</span><span>OCRmyPDF</span><span>MySQL</span><span>Multiprocessing</span>
+        </div>
+      </div>
+      <div class="project-arrow">↗</div>
+    </a>
+
+    <a href="#" class="project">
+      <div class="project-num">/10</div>
+      <div class="project-content">
+        <h3 class="project-title">Custodian &mdash; Multi-Tenant Document Management SaaS</h3>
+        <p class="project-desc">A document management SaaS where every organisation gets its own MySQL schema created at signup, so tenant data is separated by database rather than by a column. A separate Python OCR microservice adds a searchable text layer to scanned uploads before Meilisearch indexes them, and the search path degrades gracefully when the search server is absent. Includes expiring share links, document versioning, bulk ZIP export, audit logging and Stripe subscription billing. Built as part of a team.</p>
+        <div class="project-stack">
+          <span>TypeScript</span><span>Express 5</span><span>Next.js 16</span><span>MySQL</span><span>Meilisearch</span><span>Stripe</span>
+        </div>
+      </div>
+      <div class="project-arrow">↗</div>
+    </a>
+
+    <a href="#" class="project">
+      <div class="project-num">/11</div>
+      <div class="project-content">
+        <h3 class="project-title">IELTS Prep Platform &mdash; AI Band Scoring and Bilingual Tutoring</h3>
+        <p class="project-desc">An IELTS preparation app covering all four skills, with LLM band scoring, a bilingual Sinhala and English tutor, FSRS spaced repetition and speaking drills. One provider abstraction sits over both OpenAI and Claude so the grader can be switched with a single environment variable. Band descriptors go into the prompt as an explicit rubric and scoring runs criterion by criterion at low temperature, so a band comes back with reasoning attached rather than a bare number.</p>
+        <div class="project-stack">
+          <span>FastAPI</span><span>OpenAI</span><span>Claude</span><span>FSRS</span><span>Next.js PWA</span><span>Whisper</span>
+        </div>
+      </div>
+      <div class="project-arrow">↗</div>
+    </a>
+
+    <a href="#" class="project">
+      <div class="project-num">/12</div>
+      <div class="project-content">
+        <h3 class="project-title">Build Orchestrator &mdash; 17 Agent Phased Build System</h3>
+        <p class="project-desc">A 17 agent, 7 phase build orchestration system with three always on optimisation layers: a token cost manager, a skill advisor and a prompt engineer, together cutting token use by 30 to 70 percent per session. Routes across 2,195 skills in two libraries, ships a 3 agent security suite mapped to MITRE ATT&amp;CK and NIST CSF 2.0, and exposes 20 MCP servers to agents through per agent allowlists rather than one shared surface.</p>
+        <div class="project-stack">
+          <span>Claude Code</span><span>LangGraph</span><span>MCP &times; 20</span><span>Python</span><span>YAML</span>
         </div>
       </div>
       <div class="project-arrow">↗</div>
     </a>
 
     <a href="https://github.com/VisalChathuranga/Voice-Agent-Web-Interface" target="_blank" class="project">
-      <div class="project-num">/05</div>
+      <div class="project-num">/13</div>
       <div class="project-content">
         <h3 class="project-title">AI Voice Agent with RAG &amp; Telephony</h3>
-        <p class="project-desc">A production ready voice AI system integrating the OpenAI Realtime API with Twilio telephony for natural phone conversations. Dual mode operation: Full Agentic (RAG + web search + tools) and RAG Only for compliance critical industries.</p>
+        <p class="project-desc">A production ready voice AI system integrating the OpenAI Realtime API with Twilio telephony for natural phone conversations, with live two way audio streaming. Dual mode operation: full agentic with RAG, web search and tool calls, or documents only for compliance critical industries that cannot risk outside sources.</p>
         <div class="project-stack">
           <span>OpenAI Realtime</span><span>Twilio</span><span>Pinecone</span><span>Agentic AI</span>
         </div>
@@ -2261,10 +2980,10 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
     </a>
 
     <a href="https://github.com/VisalChathuranga/EHR-AI-Search.git" target="_blank" class="project">
-      <div class="project-num">/06</div>
+      <div class="project-num">/14</div>
       <div class="project-content">
-        <h3 class="project-title">EHR AI Search — Healthcare Intelligence</h3>
-        <p class="project-desc">An embeddable EHR search platform using GPT-4o Mini with natural language queries, React chat widget, and voice I/O. Integrated with real EHR APIs, deployed as a Vercel widget with FastAPI backend and Playwright-based auto token refresh.</p>
+        <h3 class="project-title">EHR AI Search &mdash; Healthcare Intelligence</h3>
+        <p class="project-desc">An embeddable EHR search platform using GPT-4o Mini with natural language queries, a React chat widget and voice input and output. Integrated with real EHR APIs, deployed as a Vercel widget with a FastAPI backend and Playwright driven automatic token refresh.</p>
         <div class="project-stack">
           <span>GPT-4o</span><span>FastAPI</span><span>React</span><span>Vercel</span><span>WebSocket</span>
         </div>
@@ -2273,10 +2992,10 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
     </a>
 
     <a href="https://github.com/VisalChathuranga/voice-to-summary" target="_blank" class="project">
-      <div class="project-num">/07</div>
+      <div class="project-num">/15</div>
       <div class="project-content">
-        <h3 class="project-title">MedScribe Pro — Medical Transcription</h3>
-        <p class="project-desc">A FastAPI platform that converts medical audio into role labeled transcripts (Doctor / Patient / Nurse) using AWS Transcribe Medical and GPT-4 for clinical summaries. Optimized with S3 Transfer Acceleration, multipart uploads, and speaker diarization.</p>
+        <h3 class="project-title">MedScribe Pro &mdash; Medical Transcription</h3>
+        <p class="project-desc">A FastAPI platform that converts medical audio into speaker labelled transcripts, doctor, patient and nurse, using AWS Transcribe Medical, then writes clinical summaries with GPT-4. Optimised with S3 transfer acceleration, multipart uploads and concurrent workers so long recordings finish in reasonable time.</p>
         <div class="project-stack">
           <span>FastAPI</span><span>AWS Transcribe</span><span>GPT-4</span><span>Diarization</span>
         </div>
@@ -2285,10 +3004,10 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
     </a>
 
     <a href="https://github.com/VisalChathuranga/Petty-Cash-System-via-whatsapp-using-python" target="_blank" class="project">
-      <div class="project-num">/08</div>
+      <div class="project-num">/16</div>
       <div class="project-content">
         <h3 class="project-title">WhatsApp Petty Cash Management SaaS</h3>
-        <p class="project-desc">A full stack multi tenant expense system with a conversational WhatsApp bot, FastAPI (MVC), and a Next.js admin panel. Features AI powered OCR (AWS Textract + GPT), RBAC, audit logging, and a dynamic rules engine for grade/location-based calculations.</p>
+        <p class="project-desc">A full stack multi tenant expense system where staff send receipts over WhatsApp. A bot reads each receipt with OCR, checks it against a rules engine and routes it to a Next.js admin panel for approval. Includes role based access, organisation provisioning, audit logging and two ways to file a claim, WhatsApp or web.</p>
         <div class="project-stack">
           <span>WhatsApp API</span><span>FastAPI</span><span>Next.js</span><span>AWS Textract</span><span>Docker</span>
         </div>
@@ -2296,23 +3015,11 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
       <div class="project-arrow">↗</div>
     </a>
 
-    <a href="https://github.com/VisalChathuranga/Diabetic-Retinopathy-Detection" target="_blank" class="project">
-      <div class="project-num">/09</div>
-      <div class="project-content">
-        <h3 class="project-title">Diabetic Retinopathy Detection — Deep Learning Classifier</h3>
-        <p class="project-desc">An automated 5 class DR severity classifier using EfficientNetB3 with Ben Graham preprocessing, achieving QWK 0.83 on APTOS 2019 and 0.57 on EyePACS across 35K+ images. Two phase training pipeline with mixed precision (fp16), WeightedRandomSampler, patient-level splitting, Test Time Augmentation, and session resilient auto resumable checkpointing.</p>
-        <div class="project-stack">
-          <span>PyTorch</span><span>EfficientNetB3</span><span>timm</span><span>Albumentations</span><span>Scikit-learn</span>
-        </div>
-      </div>
-      <div class="project-arrow">↗</div>
-    </a>
-
     <a href="https://github.com/VisalChathuranga/Amazon-Textract-Invoice-PDF-Processor-with-LLM.git" target="_blank" class="project">
-      <div class="project-num">/10</div>
+      <div class="project-num">/17</div>
       <div class="project-content">
         <h3 class="project-title">Textract Invoice Processor (LLM-Enhanced)</h3>
-        <p class="project-desc">A scalable invoice automation pipeline using AWS Textract with S3 integration, MD5 duplicate detection, and intelligent table parsing achieving 95% accuracy and reducing manual effort by 80%. Enhanced with a Gemini LLM layer for normalization.</p>
+        <p class="project-desc">A scalable invoice automation pipeline using AWS Textract with S3 integration, MD5 duplicate detection and table parsing, reaching 95% accuracy and cutting manual effort by 80%. A Gemini layer normalises dates, currencies and payment terms so the pipeline also handles invoice formats it has not seen before.</p>
         <div class="project-stack">
           <span>AWS Textract</span><span>Gemini</span><span>S3</span><span>Python</span>
         </div>
@@ -2320,11 +3027,23 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
       <div class="project-arrow">↗</div>
     </a>
 
+    <a href="https://github.com/VisalChathuranga/Diabetic-Retinopathy-Detection" target="_blank" class="project">
+      <div class="project-num">/18</div>
+      <div class="project-content">
+        <h3 class="project-title">Diabetic Retinopathy Detection &mdash; Deep Learning Classifier</h3>
+        <p class="project-desc">An automated 5 class severity classifier using EfficientNetB3 with Ben Graham preprocessing, scoring QWK 0.83 on APTOS 2019 and 0.57 on EyePACS across more than 35,000 images. Two phase training with mixed precision, weighted sampling for class imbalance, patient level splits and test time augmentation, plus auto resuming checkpoints so a free tier GPU session that dies mid run picks up where it stopped.</p>
+        <div class="project-stack">
+          <span>PyTorch</span><span>EfficientNetB3</span><span>timm</span><span>Albumentations</span><span>Scikit-learn</span>
+        </div>
+      </div>
+      <div class="project-arrow">↗</div>
+    </a>
+
     <a href="https://github.com/VisalChathuranga/YouTube-Sentiment-Insights-Plugin" target="_blank" class="project">
-      <div class="project-num">/11</div>
+      <div class="project-num">/19</div>
       <div class="project-content">
         <h3 class="project-title">YouTube Sentiment Insights</h3>
-        <p class="project-desc">An AI powered Chrome Extension and Flask backend for real time YouTube comment sentiment analysis. Built with a scalable ML pipeline using DVC, MLflow, and LightGBM, deployed as a Dockerized backend on AWS EC2 with GitHub Actions CI/CD.</p>
+        <p class="project-desc">A Chrome extension and Flask backend for real time YouTube comment sentiment analysis, trends and dashboards. Built on a reproducible ML pipeline with DVC and MLflow around a LightGBM classifier, with the backend Dockerised and deployed to AWS EC2 through GitHub Actions.</p>
         <div class="project-stack">
           <span>LightGBM</span><span>Flask</span><span>DVC</span><span>MLflow</span><span>AWS EC2</span>
         </div>
@@ -2333,10 +3052,10 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
     </a>
 
     <a href="https://github.com/VisalChathuranga/Sentiment-Analysis-Pipeline-using-DVC" target="_blank" class="project">
-      <div class="project-num">/12</div>
+      <div class="project-num">/20</div>
       <div class="project-content">
         <h3 class="project-title">Sentiment Analysis Pipeline with DVC</h3>
-        <p class="project-desc">An end to end ML pipeline for tweet emotion detection achieving 87% accuracy with Gradient Boosting. Fully automated stages via dvc.yaml data ingestion through evaluation reducing reruns by 90%.</p>
+        <p class="project-desc">An end to end ML pipeline for tweet emotion detection reaching 87% accuracy with Gradient Boosting. All five stages are declared in dvc.yaml, so changing one stage reruns only what depends on it instead of the whole pipeline.</p>
         <div class="project-stack">
           <span>Scikit-learn</span><span>NLTK</span><span>DVC</span><span>Python</span>
         </div>
@@ -2345,10 +3064,10 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
     </a>
 
     <a href="https://github.com/VisalChathuranga/AI-Based-Desktop-Application-for-Reflow-Oven-Profile-Predictor" target="_blank" class="project">
-      <div class="project-num">/13</div>
+      <div class="project-num">/21</div>
       <div class="project-content">
         <h3 class="project-title">Reflow Oven Profile Predictor</h3>
-        <p class="project-desc">A hybrid desktop application built with Electron.js and a Python Flask backend, integrating TensorFlow/Keras neural networks to optimize soldering temperature profiles for industrial reflow ovens delivering measurable quality improvements.</p>
+        <p class="project-desc">A hybrid desktop application built with an Electron.js frontend and a Python Flask backend, using TensorFlow and Keras neural networks to predict optimal soldering temperature profiles for industrial reflow ovens. Runs completely offline on the factory floor.</p>
         <div class="project-stack">
           <span>Electron.js</span><span>TensorFlow</span><span>Flask</span><span>Keras</span>
         </div>
@@ -2357,10 +3076,10 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
     </a>
 
     <a href="https://github.com/VisalChathuranga/Visal-CRUD-WebApp.git" target="_blank" class="project">
-      <div class="project-num">/14</div>
+      <div class="project-num">/22</div>
       <div class="project-content">
         <h3 class="project-title">MERN CRUD Web App</h3>
-        <p class="project-desc">A full stack MERN application with secure JWT authentication, RESTful APIs, PDF report generation, and a responsive glassmorphism UI with real-time data updates across all devices.</p>
+        <p class="project-desc">A full stack MERN application with JWT authentication, a RESTful API, PDF report generation and a responsive interface with real time data updates across devices.</p>
         <div class="project-stack">
           <span>MongoDB</span><span>Express</span><span>React</span><span>Node.js</span><span>JWT</span>
         </div>
@@ -2505,19 +3224,51 @@ footer .heart { display: inline-block; animation: beat 1.2s ease-in-out infinite
 
 <script>
 // ============ LOADER — bulletproof dismissal ============
-// Fires from page parse start (not waiting on fonts/images), with a safety net
-setTimeout(function() {
-  var loader = document.getElementById('loader');
-  if (loader) loader.classList.add('hide');
-}, 2400);
+// Dismisses as soon as the DOM is ready instead of always waiting the full
+// 2.4s. MIN_MS (1.75s) is the point where the name reveal and the progress
+// bar have both finished, so a fast load never cuts the animation mid-stroke.
+// Both original timers stay on as safety nets.
+(function() {
+  var MIN_MS = 1750;   // longest loader animation: bar = 0.3s delay + 1.4s run
+  var MAX_MS = 2400;   // the previous fixed dismissal, kept as net 1
+  var start  = Date.now();
 
-// Safety net: if anything above fails, still hide after 4s
-setTimeout(function() {
-  var loader = document.getElementById('loader');
-  if (loader && !loader.classList.contains('hide')) {
-    loader.classList.add('hide');
+  var announced = false;
+  function hideLoader() {
+    var loader = document.getElementById('loader');
+    if (loader) loader.classList.add('hide');
+    if (announced) return;
+    announced = true;
+    // the hero constellation waits on this before it starts assembling
+    try { document.dispatchEvent(new CustomEvent('portfolio:ready')); }
+    catch (e) {
+      var ev = document.createEvent('Event');
+      ev.initEvent('portfolio:ready', false, false);
+      document.dispatchEvent(ev);
+    }
   }
-}, 4000);
+
+  function dismiss() {
+    setTimeout(hideLoader, Math.max(0, MIN_MS - (Date.now() - start)));
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', dismiss);
+  } else {
+    dismiss();
+  }
+
+  // Net 1: dismiss on the old fixed timer if DOMContentLoaded never fires
+  setTimeout(hideLoader, MAX_MS);
+
+  // Net 2: if anything above fails, still hide after 4s
+  setTimeout(function() {
+    var loader = document.getElementById('loader');
+    if (loader && !loader.classList.contains('hide')) {
+      loader.classList.add('hide');
+    }
+  }, 4000);
+})();
 
 // Wrap the rest in try/catch so any error below can't break the loader
 try {
@@ -2695,12 +3446,30 @@ window.addEventListener('scroll', function() {
   var italic = document.querySelector('.hero h1 .italic');
   if (!h1 || !italic) return;
 
-  // Override static accent so JS controls the colour from the start
-  italic.style.color = '#f2ede1';        // --fg
   h1.style.transformOrigin = 'left 48%';
 
-  var FG     = [242, 237, 225];          // #f2ede1
-  var ACCENT = [197, 255,  58];          // #c5ff3a
+  // FG is read from the --fg custom property rather than hardcoded, so the
+  // command-palette light theme repaints the name instead of leaving it cream
+  // on cream. Cached, and only re-parsed when the token actually changes.
+  var FG = [242, 237, 225];              // #f2ede1 (dark-theme default)
+  var fgCache = '';
+  function readFG() {
+    var raw = getComputedStyle(document.documentElement)
+                .getPropertyValue('--fg').trim();
+    if (raw === fgCache || !raw) return;
+    fgCache = raw;
+    var m = raw.replace('#', '');
+    if (m.length === 3) m = m[0]+m[0]+m[1]+m[1]+m[2]+m[2];
+    if (m.length === 6) {
+      FG = [parseInt(m.slice(0,2),16), parseInt(m.slice(2,4),16), parseInt(m.slice(4,6),16)];
+    }
+  }
+  readFG();
+
+  // Override static accent so JS controls the colour from the start
+  italic.style.color = 'rgb(' + FG[0] + ',' + FG[1] + ',' + FG[2] + ')';
+
+  var ACCENT = [92, 63, 163];            // #5c3fa3 cream-theme iris
   var WARP_MAX  = 500;                   // scroll px where warp peaks
   var COLOR_MAX = 420;                   // scroll px where colour peaks
 
@@ -2717,6 +3486,8 @@ window.addEventListener('scroll', function() {
     // Skip when change is imperceptible (< 0.1%)
     if (Math.abs(pW - lastP) < 0.001) return;
     lastP = pW;
+
+    readFG();   // picks up a theme switch on the next scroll frame
 
     // ── Warp ──────────────────────────────────────────────────────────
     var skew   = pW * -2.5;
@@ -2750,7 +3521,13 @@ var revealObserver = new IntersectionObserver(function(entries) {
       revealObserver.unobserve(e.target);
     }
   });
-}, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+// threshold MUST stay 0 here. IntersectionObserver's ratio is
+// intersectionArea / targetArea, so an element taller than the viewport can
+// never reach a fractional threshold: #projects is ~7,800px tall, which made
+// 0.12 require a 942px-tall viewport. On any shorter window the callback never
+// fired and the whole projects section stayed at opacity 0. The "reveal a beat
+// late" feel now comes from rootMargin, which is independent of element height.
+}, { threshold: 0, rootMargin: '0px 0px -80px 0px' });
 
 document.querySelectorAll('.reveal, .reveal-stagger, .word-reveal').forEach(function(el) {
   revealObserver.observe(el);
@@ -2826,7 +3603,9 @@ document.querySelectorAll('.skill-group').forEach(function(group) {
   var mount = document.getElementById('skillsGlobe');
   var tip   = document.getElementById('globeTip');
   if (!mount) return;
-  var THREE = window.THREE;
+  // Bound later: three.js is fetched on demand by loadThree(), so it does not
+  // exist yet when this script first runs.
+  var THREE = null;
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // id, label, cat (0-3), proficiency  (positions on the 2D map are dropped;
@@ -2834,17 +3613,24 @@ document.querySelectorAll('.skill-group').forEach(function(group) {
   var RAW_NODES = [
     ['python','Python',0,'3+ yrs'], ['ts','TypeScript',0,'2+ yrs'], ['js','JavaScript',0,'3+ yrs'],
     ['html','HTML',0,'4+ yrs'], ['css','CSS',0,'4+ yrs'],
+    ['sql','SQL',0,'3+ yrs'], ['bash','Bash / PowerShell',0,'2+ yrs'],
     ['tf','TensorFlow',1,'2+ yrs'], ['keras','Keras',1,'2+ yrs'], ['lchain','LangChain',1,'1+ yr'],
     ['lgraph','LangGraph',1,'1 yr'], ['hf','HuggingFace',1,'1+ yr'], ['openai','OpenAI SDK',1,'2+ yrs'],
     ['sklearn','Scikit-learn',1,'2+ yrs'], ['nltk','NLTK',1,'2+ yrs'], ['opencv','OpenCV',1,'1+ yr'],
-    ['mediapipe','MediaPipe',1,'1 yr'],
+    ['mediapipe','MediaPipe',1,'1 yr'], ['pytorch','PyTorch',1,'1+ yr'],
+    ['lightgbm','LightGBM',1,'1+ yr'], ['timm','timm',1,'1 yr'],
+    ['albu','Albumentations',1,'1 yr'],
     ['nextjs','Next.js',2,'2+ yrs'], ['react','React',2,'2+ yrs'], ['nodejs','Node.js',2,'2+ yrs'],
     ['express','Express.js',2,'2+ yrs'], ['fastapi','FastAPI',2,'2+ yrs'], ['flask','Flask',2,'2+ yrs'],
     ['ejs','EJS',2,'1 yr'], ['prisma','Prisma',2,'1+ yr'],
+    ['electron','Electron.js',2,'1+ yr'], ['drizzle','Drizzle ORM',2,'<1 yr'],
+    ['sqlalchemy','SQLAlchemy',2,'1+ yr'],
     ['aws','AWS',3,'2+ yrs'], ['vercel','Vercel',3,'2+ yrs'], ['mongodb','MongoDB',3,'2+ yrs'],
     ['postgres','PostgreSQL',3,'2+ yrs'], ['pinecone','Pinecone',3,'1+ yr'], ['neo4j','Neo4j',3,'<1 yr'],
     ['docker','Docker',3,'1+ yr'], ['k8s','Kubernetes',3,'<1 yr'], ['dvc','DVC',3,'1+ yr'],
-    ['mlflow','MLflow',3,'1+ yr'], ['twilio','Twilio',3,'1+ yr'], ['ws','WebSocket',3,'1+ yr']
+    ['mlflow','MLflow',3,'1+ yr'], ['twilio','Twilio',3,'1+ yr'], ['ws','WebSocket',3,'1+ yr'],
+    ['qdrant','Qdrant',3,'<1 yr'], ['sqlserver','SQL Server',3,'1+ yr'],
+    ['chroma','ChromaDB',3,'1 yr'], ['ghactions','GitHub Actions',3,'1+ yr']
   ];
   var RAW_EDGES = [
     ['python','ts'],['python','js'],['ts','js'],['ts','html'],['html','css'],['css','python'],
@@ -2858,11 +3644,22 @@ document.querySelectorAll('.skill-group').forEach(function(group) {
     ['python','tf'],['python','sklearn'],['python','fastapi'],['python','flask'],
     ['ts','nextjs'],['ts','react'],['js','nodejs'],['fastapi','aws'],['nodejs','mongodb'],
     ['nextjs','vercel'],['lchain','pinecone'],['tf','mlflow'],['sklearn','dvc'],
-    ['openai','ws'],['react','ws']
+    ['openai','ws'],['react','ws'],
+    // edges for the skills added from the CV
+    ['sql','python'],['sql','postgres'],['sql','sqlserver'],['sqlserver','mongodb'],
+    ['bash','docker'],['bash','python'],['bash','ghactions'],
+    ['pytorch','tf'],['pytorch','timm'],['timm','albu'],['albu','opencv'],
+    ['lightgbm','sklearn'],['lightgbm','python'],
+    ['electron','js'],['electron','flask'],['drizzle','nextjs'],['drizzle','ts'],
+    ['sqlalchemy','python'],['sqlalchemy','fastapi'],['sqlalchemy','sqlserver'],
+    ['qdrant','pinecone'],['qdrant','chroma'],['chroma','lchain'],
+    ['ghactions','docker'],['ghactions','aws']
   ];
   var CAT_LABELS = ['Languages', 'AI / ML', 'Web / App', 'Cloud / Data'];
   // strictly within the site palette: accent, pale-lime, accent-dim, cream
-  var CAT_HEX = [0xc5ff3a, 0xe8ff9e, 0x8fb825, 0xf2ede1];
+  // violet / amber / teal / bone — the constellation reads as distributed
+  // intelligence, so each category takes one of the brand's chromatic sparks
+  var CAT_HEX = [0x5c3fa3, 0xa45f00, 0x087566, 0x334653];
 
   function showFallback() {
     var mob = document.querySelector('.skill-mobile');
@@ -2874,7 +3671,8 @@ document.querySelectorAll('.skill-group').forEach(function(group) {
     if (hint)   hint.style.display = 'none';
   }
 
-  if (!THREE) { showFallback(); return; }
+  // (No early bail-out here any more. three.js is absent on purpose at this
+  //  point; boot() decides whether to fetch it, and falls back if it cannot.)
 
   var built = false;
   function isDesktop() { return window.innerWidth >= 768 && mount.clientWidth > 0; }
@@ -2957,7 +3755,7 @@ document.querySelectorAll('.skill-group').forEach(function(group) {
 
       var sm = new THREE.SpriteMaterial({
         map: HALO_TEX, color: col, transparent: true, opacity: 0.55,
-        blending: THREE.AdditiveBlending, depthWrite: false
+        blending: THREE.NormalBlending, depthWrite: false
       });
       var halo = new THREE.Sprite(sm);
       halo.position.copy(pos);
@@ -2985,7 +3783,7 @@ document.querySelectorAll('.skill-group').forEach(function(group) {
     var bGeo = new THREE.BufferGeometry();
     bGeo.setAttribute('position', new THREE.Float32BufferAttribute(bp, 3));
     baseLines = new THREE.LineSegments(bGeo, new THREE.LineBasicMaterial({
-      color: 0xc5ff3a, transparent: true, opacity: 0.085
+      color: 0x5c3fa3, transparent: true, opacity: 0.20
     }));
     group.add(baseLines);
 
@@ -2994,7 +3792,7 @@ document.querySelectorAll('.skill-group').forEach(function(group) {
     hiGeo.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(RAW_EDGES.length * 6), 3));
     hiGeo.setDrawRange(0, 0);
     hiLines = new THREE.LineSegments(hiGeo, new THREE.LineBasicMaterial({
-      color: 0xc5ff3a, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending
+      color: 0xa45f00, transparent: true, opacity: 0.95, blending: THREE.NormalBlending
     }));
     hiLines.renderOrder = 1;
     group.add(hiLines);
@@ -3003,7 +3801,7 @@ document.querySelectorAll('.skill-group').forEach(function(group) {
     var sg = new THREE.SphereGeometry(0.028, 10, 10);
     for (var k = 0; k < 22; k++) {
       var sMat = new THREE.MeshBasicMaterial({
-        color: 0xeaffb0, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false
+        color: 0xa45f00, transparent: true, opacity: 0, blending: THREE.NormalBlending, depthWrite: false
       });
       var sMesh = new THREE.Mesh(sg, sMat);
       sMesh.visible = false;
@@ -3051,7 +3849,7 @@ document.querySelectorAll('.skill-group').forEach(function(group) {
         d.mat.opacity = 0.92; d.halo.opacity = 0.55;
         d.mesh.scale.setScalar(1);
       });
-      baseLines.material.opacity = 0.085;
+      baseLines.material.opacity = 0.20;
       hiGeo.setDrawRange(0, 0);
       if (tip) { tip.classList.remove('show'); tip.setAttribute('aria-hidden', 'true'); }
       mount.style.cursor = dragging ? 'grabbing' : 'grab';
@@ -3070,7 +3868,7 @@ document.querySelectorAll('.skill-group').forEach(function(group) {
         d.mesh.scale.setScalar(0.9);
       }
     });
-    baseLines.material.opacity = 0.04;
+    baseLines.material.opacity = 0.07;
 
     // build highlight edge geometry from connected edges
     var arr = hiGeo.attributes.position.array;
@@ -3186,10 +3984,25 @@ document.querySelectorAll('.skill-group').forEach(function(group) {
   }
 
   // ---- boot ----
+  // three.js is fetched only when the globe is actually about to be drawn:
+  // desktop viewport, section near the fold. Mobile never downloads it.
+  var threeState = 0; // 0 = not started, 1 = loading, 2 = ready, 3 = failed
+  function loadThree(cb) {
+    if (window.THREE) { THREE = window.THREE; threeState = 2; cb(); return; }
+    if (threeState === 1 || threeState === 3) return;
+    threeState = 1;
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+    s.async = true;
+    s.onload  = function() { THREE = window.THREE; threeState = 2; cb(); };
+    s.onerror = function() { threeState = 3; showFallback(); };
+    document.head.appendChild(s);
+  }
+
   function boot() {
     if (built) return;
-    if (isDesktop()) build();
-    else if (!window.THREE) showFallback();
+    if (!isDesktop()) { showFallback(); return; }
+    loadThree(function() { if (!built && isDesktop()) build(); });
   }
   // build lazily once the section is reachable / on first desktop layout
   if (isDesktop()) {
@@ -3208,94 +4021,202 @@ document.querySelectorAll('.skill-group').forEach(function(group) {
 // ============ CASE STUDIES ============
 var csStudies = [
   {
-    num: '/01', title: 'DocSearch AI', subtitle: 'Legal Document Intelligence',
-    href: 'https://github.com/Aeliusmd/Docsearch-APP.git',
-    problem: 'Most legal search tools are keyword-based, which means they miss context. You search for a case and get back hundreds of loosely related results. Lawyers were spending hours just reading through noise to find the two that actually mattered.',
-    approach: 'I built a <strong>RAG pipeline</strong> using OpenAI embeddings and Pinecone to search documents semantically, not just by keyword. Each uploaded file gets its own session index so it stays isolated. Answers stream back token-by-token over <strong>WebSocket</strong>, with source chunks cited right alongside.',
-    stack: ['PDF / Text Ingestion', 'Chunking & Embedding', 'Pinecone Vector Store', 'GPT-4o Retrieval', 'WebSocket API', 'React Chat UI'],
-    metrics: [{ val: '~92%', label: 'Retrieval relevance' }, { val: '<2s', label: 'Query latency' }, { val: '10k+', label: 'Docs indexed' }, { val: 'Live', label: 'Streaming' }],
-    shots: ['Search Interface', 'Document Upload', 'Chat & Citations']
+    num: "/01", title: "APEX Team", subtitle: "Self Coordinating 14-Agent AI Dev System",
+    href: "https://github.com/VisalChathuranga/apex-multiagent-team",
+    problem: "One engineer cannot hold architecture, backend, frontend, database, testing and security in their head at the same time. Handing all of it to a single AI agent does not fix that either, because the same context window has to serve every role at once and the work comes out shallow.",
+    approach: "Fourteen specialist agents spawn from <strong>one command</strong>, each with its own persona and skill set. They coordinate through a file-locked shared state file, verified at 200 concurrent writes with no data loss. A single <strong>MCP server with 81 tools</strong> budgets tokens, shares summaries between agents, and routes work across 2,195 skills so no agent sees a tool surface it does not need.",
+    stack: ["Single Command Launch", "14 Specialist Agents", "File-Locked Shared State", "81-Tool MCP Server", "6-Stage Debate Engine", "WebSocket Dashboard"],
+    metrics: [{ val: "14", label: "Specialist agents" }, { val: "81", label: "MCP tools" }, { val: "2,195", label: "Skills routed" }, { val: "30&ndash;70%", label: "Token reduction" }],
+    shots: ["Agent Roster", "Live Dashboard", "Debate Timeline"]
   },
   {
-    num: '/02', title: 'AI Voice Agent', subtitle: 'RAG & Telephony Integration',
-    href: 'https://github.com/VisalChathuranga/Voice-Agent-Web-Interface',
-    problem: 'Phone bots today are still painful. They break on anything unexpected and can\'t actually answer questions from your own documentation. Businesses need something that can pick up the phone and have a real conversation.',
-    approach: 'I wired <strong>OpenAI\'s Realtime API</strong> into Twilio\'s PSTN to get audio latency under 300ms. The system runs in two modes: full agentic (RAG, web search, tool calls) for general use, and RAG-only for industries with compliance requirements. VAD handles natural turn-taking.',
-    stack: ['Twilio PSTN', 'OpenAI Realtime API', 'Pinecone RAG', 'Web Search Tools', 'Node.js WS Bridge', 'React Monitor UI'],
-    metrics: [{ val: '<300ms', label: 'Audio latency' }, { val: '2', label: 'Operational modes' }, { val: 'PSTN', label: 'Phone integration' }, { val: 'Live', label: 'Tool calling' }],
-    shots: ['Voice Dashboard', 'Call Monitor', 'RAG Config Panel']
+    num: "/02", title: "Agent Cortex", subtitle: "Long Term Memory Service for AI Agents",
+    href: "https://github.com/VisalChathuranga/agent-cortex",
+    problem: "AI agents forget everything the moment a session ends. Every conversation restarts from zero, the same context gets re-explained, and hard won decisions are lost. The hosted alternatives solve it by taking custody of your data, which is exactly the wrong trade for private work.",
+    approach: "A plain <strong>Markdown vault</strong> is the source of truth and Qdrant is a disposable index that can be rebuilt from it. Retrieval is genuinely hybrid: dense vectors fused with a hand written <strong>BM25</strong> ranker through Reciprocal Rank Fusion, then reordered by usefulness and access count. Recall is packed into a token budget across 8 layers, and the layers that matter cannot be dropped. Embeddings run on CPU, so no GPU and no data egress.",
+    stack: ["Markdown Vault", "CPU Embeddings", "Qdrant Vector Index", "BM25 + RRF Fusion", "8-Layer Recall Budget", "MCP + REST + CLI"],
+    metrics: [{ val: "22", label: "MCP tools" }, { val: "49", label: "REST endpoints" }, { val: "91", label: "Offline tests" }, { val: "8", label: "Recall layers" }],
+    shots: ["Recall Bundle", "Entity Graph", "Health Report"]
   },
   {
-    num: '/03', title: 'EHR AI Search', subtitle: 'Healthcare Intelligence Platform',
-    href: 'https://github.com/VisalChathuranga/EHR-AI-Search.git',
-    problem: 'EHR interfaces weren\'t designed for speed. Clinicians click through five screens to pull basic patient data, under time pressure. Natural language could cut that to one query, but EHR APIs expect structured calls and sessions expire constantly.',
-    approach: '<strong>GPT-4o Mini</strong> takes whatever the clinician types and turns it into a structured EHR API call. Playwright runs in the background to refresh tokens silently. I packaged it as a React widget that embeds into any EHR frame, deployed via Vercel. FastAPI handles caching and the voice query path.',
-    stack: ['React Embed Widget', 'FastAPI Backend', 'GPT-4o Mini', 'EHR REST APIs', 'Playwright Auth', 'Vercel Edge CDN'],
-    metrics: [{ val: '<500ms', label: 'Query response' }, { val: 'NL', label: 'Natural language' }, { val: 'Voice', label: 'I/O support' }, { val: 'Widget', label: 'Embeddable' }],
-    shots: ['Chat Widget', 'EHR Data View', 'Voice Query Mode']
+    num: "/03", title: "Agentic Case Search", subtitle: "Natural Language Over Legal Case Data",
+    href: "#",
+    problem: "Legal staff had to know which of two dozen filters and screens held the answer. Asking something as ordinary as which open cases sit with a given attorney in a given venue meant clicking through several forms. Natural language fixes that, but a model let loose on a case management API invents filters and states counts that were never true.",
+    approach: "An agent picks from a <strong>22 tool registry</strong> and runs a tool loop capped at five steps. A three stage router, regex intent classifier then domain modules then an LLM classifier, narrows the list to at most eight tools before the model sees anything. Dates, roles and counts are worked out <strong>on the server</strong> and injected as verified facts, so the model can only repeat a number it was handed.",
+    stack: ["Regex Intent Router", "8 Domain Modules", "LLM Domain Classifier", "22-Tool Registry", "Server-Verified Facts", "Streamed Answers"],
+    metrics: [{ val: "22", label: "Tools registered" }, { val: "8", label: "Max tools per call" }, { val: "539", label: "Tests" }, { val: "186K", label: "Token overflow fixed" }],
+    shots: ["Chat Widget", "Case Result Cards", "Filter Breakdown"]
   },
   {
-    num: '/04', title: 'MedScribe Pro', subtitle: 'Medical Transcription & Summaries',
-    href: 'https://github.com/VisalChathuranga/voice-to-summary',
-    problem: 'Transcribing a consultation manually takes almost as long as the consultation itself. Generic transcription tools make it worse — they have no idea who\'s talking. You can\'t write a clinical summary if you can\'t separate the doctor\'s words from the patient\'s.',
-    approach: 'I used <strong>AWS Transcribe Medical</strong> with diarization to label each speaker as Doctor, Patient, or Nurse. Large audio files go through S3 with multipart uploads and Transfer Acceleration. GPT-4 then reads the role-labeled transcript and writes a structured <strong>SOAP-format summary</strong> from it.',
-    stack: ['Audio Upload UI', 'S3 Transfer Accel.', 'AWS Transcribe Med.', 'Speaker Diarization', 'GPT-4 Summaries', 'FastAPI'],
-    metrics: [{ val: '95%', label: 'Transcription accuracy' }, { val: '3', label: 'Speaker roles' }, { val: '80%', label: 'Time reduction' }, { val: 'SOAP', label: 'Output format' }],
-    shots: ['Audio Upload', 'Role-labeled Transcript', 'Clinical Summary']
+    num: "/04", title: "VScanMail", subtitle: "AI Powered Digital Mail Custodian SaaS",
+    href: "https://github.com/VisalChathuranga/VScanMail",
+    problem: "A mail custodian receives physical post on behalf of hundreds of client companies. Every envelope has to be opened, scanned, identified, routed to the right client, and if it holds a cheque, validated before deposit. One misrouted document is a compliance incident, not an inconvenience.",
+    approach: "Tenant isolation is <strong>physical, not a column</strong>: each client gets its own database table, so one client's records cannot appear in another's query. GPT-4o Vision reads cheques and detects tampered envelopes, but the decisions stay deterministic. Amount cross validation, beneficiary matching and staleness checks are computed in code, so a confident model cannot approve a bad cheque.",
+    stack: ["Table-Per-Tenant Isolation", "GPT-4o Vision Extraction", "Deterministic Validation", "AES-256-GCM Encryption", "TOTP Two Factor", "Stripe Subscriptions"],
+    metrics: [{ val: "144", label: "API endpoints" }, { val: "47", label: "Audited actions" }, { val: "6", label: "Cheque lifecycle states" }, { val: "4s", label: "DDL stall removed" }],
+    shots: ["Mail Queue", "Cheque Validation", "Deposit Approval"]
   },
   {
-    num: '/05', title: 'WhatsApp Petty Cash', subtitle: 'Multi-tenant Expense SaaS',
-    href: 'https://github.com/VisalChathuranga/Petty-Cash-System-via-whatsapp-using-python',
-    problem: 'Getting field employees to adopt a new expense app just doesn\'t happen. But they\'re already on WhatsApp. Finance teams still need proper audit trails and structured data. The question was whether you could make WhatsApp the front-end for a full SaaS backend.',
-    approach: 'Employees just message a receipt photo to the WhatsApp bot. <strong>AWS Textract</strong> and GPT pull out the structured fields. The FastAPI backend handles multi-tenant schemas, RBAC, and a full audit log. Finance teams review everything through a <strong>Next.js</strong> admin dashboard.',
-    stack: ['WhatsApp Business API', 'FastAPI MVC', 'AWS Textract OCR', 'GPT Normalization', 'PostgreSQL RBAC', 'Next.js Admin Panel'],
-    metrics: [{ val: 'Multi', label: 'Tenant support' }, { val: 'OCR', label: 'Receipt parsing' }, { val: 'RBAC', label: 'Access control' }, { val: 'Audit', label: 'Full logging' }],
-    shots: ['WhatsApp Bot Flow', 'Receipt OCR Result', 'Admin Dashboard']
+    num: "/05", title: "DocSearch AI", subtitle: "Legal Document Intelligence",
+    href: "https://github.com/Aeliusmd/Docsearch-APP.git",
+    problem: "Semantic search alone quietly fails on legal text. Ask for a specific section number and a pure vector search hands back passages that are merely about the topic. Lawyers need the exact clause, they need to see it on the page it came from, and they cannot act on a citation that might be invented.",
+    approach: "Retrieval runs two ways at once. Pinecone dense vectors and an in process <strong>MiniSearch</strong> keyword index are merged with <strong>Reciprocal Rank Fusion</strong>, weighted so literal matches can outrank semantic neighbours, with a SQL phrase scan behind both. Grounding is enforced, not hoped for: the model emits a verbatim quote, and any quote absent from the retrieved pages strips its own citation.",
+    stack: ["Vision OCR Fallback", "Structure-Aware Chunking", "Pinecone + MiniSearch", "RRF Fusion", "Quote Verification", "Coordinate Highlighting"],
+    metrics: [{ val: "100", label: "API routes" }, { val: "1.85&times;", label: "Keyword RRF weight" }, { val: "~4 min", label: "Ingest time cut" }, { val: "0", label: "Ungrounded citations" }],
+    shots: ["Hybrid Search", "Answer with Citations", "In-Page Highlight"]
   },
   {
-    num: '/06', title: 'Textract Invoice Processor', subtitle: 'LLM-Enhanced Document Pipeline',
-    href: 'https://github.com/VisalChathuranga/Amazon-Textract-Invoice-PDF-Processor-with-LLM.git',
-    problem: 'Every vendor formats invoices differently. Finance teams were manually keying in data from hundreds of documents a month, catching duplicates by eye, and still ending up with mismatched field names on the other side.',
-    approach: '<strong>AWS Textract</strong> pulls text and tables from PDFs and scans. An MD5 hash on each document catches duplicates before they go anywhere near the pipeline. A <strong>Gemini layer</strong> then normalizes the inconsistent field names and table layouts different vendors throw at it, and outputs clean JSON.',
-    stack: ['S3 Document Store', 'AWS Textract OCR', 'MD5 Dedup Check', 'Table Parsing', 'Gemini LLM', 'Structured JSON Output'],
-    metrics: [{ val: '95%', label: 'Parse accuracy' }, { val: '80%', label: 'Manual effort cut' }, { val: 'MD5', label: 'Dedup detection' }, { val: 'Multi', label: 'Format support' }],
-    shots: ['Invoice Upload', 'Extracted Fields', 'Normalised Output']
+    num: "/06", title: "DxScript eRx", subtitle: "Multi Agent HL7 Prescription Pipeline",
+    href: "#",
+    problem: "An e-prescribing vendor drops HL7 pharmacy order files onto a shared folder. Each one has to reach the right clinic's own database and match the right patient, visit, order and drug. Six clinics, six separate databases, and a message that names its clinic only inside its own header.",
+    approach: "Three agents on a <strong>LangGraph state machine</strong>. Ingestion waits until each file is fully written before touching it, then parses and hashes it so nothing is processed twice. Routing walks a <strong>seven step chain</strong> and builds the clinic's connection at run time, tolerating databases that differ in columns. Monitoring runs inside the graph and on its own thread, so a hang is distinguishable from a cycle that never started.",
+    stack: ["Folder Watcher", "HL7 v2.3 Parser", "7-Step Resolution Chain", "Per-Clinic Connections", "Dual-Flag Write Gate", "Liveness Monitoring"],
+    metrics: [{ val: "14,162", label: "Messages processed" }, { val: "6", label: "Clinic sites" }, { val: "3", label: "Coordinated agents" }, { val: "341&rarr;40s", label: "Scan time" }],
+    shots: ["Pipeline Health", "Routing Report", "Parked Queue"]
   },
   {
-    num: '/07', title: 'YouTube Sentiment Insights', subtitle: 'ML Pipeline & Chrome Extension',
-    href: 'https://github.com/VisalChathuranga/YouTube-Sentiment-Insights-Plugin',
-    problem: 'Reading 10,000 YouTube comments to understand audience sentiment is not something a human does well. The signal is buried in the noise, but pulling it out requires automation that works right in the browser.',
-    approach: 'I trained a <strong>LightGBM classifier</strong> on TF-IDF features from comment text. DVC versions the data and model artifacts for full reproducibility; MLflow tracks experiments. The backend runs as a Dockerized Flask API on EC2 with GitHub Actions handling deploys. A <strong>Chrome Extension</strong> surfaces sentiment badges directly on the YouTube page.',
-    stack: ['YouTube Comments API', 'NLTK / TF-IDF', 'LightGBM Model', 'MLflow Tracking', 'DVC Pipeline', 'Flask + Docker + EC2', 'Chrome Extension'],
-    metrics: [{ val: '87%', label: 'Classification acc.' }, { val: 'Real-time', label: 'Analysis' }, { val: 'CI/CD', label: 'GitHub Actions' }, { val: 'DVC', label: 'Reproducible' }],
-    shots: ['Chrome Extension UI', 'Sentiment Dashboard', 'Pipeline DAG']
+    num: "/07", title: "EDI 835 ERA Platform", subtitle: "Insurance Payment Ingestion at Scale",
+    href: "#",
+    problem: "US insurers return payment decisions as X12 835 remittance files, a dense delimited format where even the delimiters are declared inside the header. Billing teams were opening them by hand to work out what was paid, what was denied, and which of hundreds of reason codes explained the difference.",
+    approach: "A parser written <strong>from scratch</strong>, no library, handling 17 segment types with both claim level and service line level posting, and resolving every adjustment against <strong>1,434 CARC and RARC codes</strong>. Ingestion is exactly once by construction: a file tracker plus a compound unique index, so a crash or an overlapping run cannot double post. A circuit breaker separates a claim that is genuinely absent from an API that is down.",
+    stack: ["SFTP Polling", "X12 835 Parser", "CARC / RARC Mapping", "Billing API Enrichment", "Circuit Breaker", "JWT Lookup API"],
+    metrics: [{ val: "11,634", label: "ERA records stored" }, { val: "1,434", label: "Reason codes mapped" }, { val: "98%", label: "Invoices matched" }, { val: "17", label: "X12 segment types" }],
+    shots: ["Upload & Parse", "Claim Breakdown", "Excel Export"]
   },
   {
-    num: '/08', title: 'Sentiment Analysis Pipeline', subtitle: 'Reproducible ML with DVC',
-    href: 'https://github.com/VisalChathuranga/Sentiment-Analysis-Pipeline-using-DVC',
-    problem: 'ML experiments without proper versioning are a mess to reproduce. Change one preprocessing step and rerun everything from scratch, and you\'ve wasted hours. I wanted a pipeline where only what changed actually gets rerun.',
-    approach: 'A <strong>dvc.yaml</strong> file defines all five stages declaratively. Touch one stage, and DVC reruns only what depends on it. Gradient Boosting on NLTK features gets to 87% accuracy on tweet emotion detection, and the whole thing stays reproducible across machines.',
-    stack: ['Raw Tweet Dataset', 'DVC Data Versioning', 'NLTK Preprocessing', 'TF-IDF Features', 'Gradient Boosting', 'DVC Evaluation'],
-    metrics: [{ val: '87%', label: 'Accuracy' }, { val: '90%', label: 'Rerun reduction' }, { val: '5', label: 'Pipeline stages' }, { val: '100%', label: 'Reproducible' }],
-    shots: ['Pipeline DAG View', 'Experiment Metrics', 'Confusion Matrix']
+    num: "/08", title: "Immunization Registry Service", subtitle: "HL7 v2.5.1 State Reporting Integration",
+    href: "#",
+    problem: "State law requires every vaccine dose to be reported to the immunization registry. Doing that by hand does not scale across seven clinics, and a wrong vaccine code does not just fail, it lands permanently on a patient's state immunization record where nobody will question it again.",
+    approach: "The service reads clinic databases <strong>read only</strong> and keeps its own state separately, so it needed no schema change from the team that owns the EMR. It refuses to infer: any dose missing a CVX code, a route, or a clinical sign off is parked with a named status and an owner instead of being sent. Duplicate submission is prevented by a <strong>unique index</strong>, so a crash mid run cannot double report a dose.",
+    stack: ["Read-Only Extraction", "CDC Code Set Validation", "HL7 v2.5.1 VXU", "SOAP 1.2 Submission", "Durable Outbox", "Retry Ladder"],
+    metrics: [{ val: "7", label: "Clinic tenants" }, { val: "540", label: "CDC codes loaded" }, { val: "38", label: "Unit tests" }, { val: "11", label: "Outbox states" }],
+    shots: ["Readiness Check", "Product Validation", "Outbox Status"]
   },
   {
-    num: '/09', title: 'Reflow Oven Predictor', subtitle: 'Industrial AI Desktop App',
-    href: 'https://github.com/VisalChathuranga/AI-Based-Desktop-Application-for-Reflow-Oven-Profile-Predictor',
-    problem: 'Getting a reflow oven profile right is slow. Adjust a parameter, run a full cycle, see what happened. One bad board means scrapping a batch. There had to be a way to predict the right profile before committing to a run.',
-    approach: 'A <strong>Keras neural network</strong> trained on historical oven data predicts optimal parameters from PCB specs and paste type. I packaged it as a hybrid <strong>Electron.js</strong> desktop app with a Python Flask backend, so technicians get a native UI that works completely offline.',
-    stack: ['PCB Spec Input', 'Electron.js UI', 'Python Flask API', 'Keras Neural Net', 'Profile Prediction', 'Local Deployment'],
-    metrics: [{ val: 'Fewer', label: 'Trial cycles' }, { val: 'Neural', label: 'Network model' }, { val: 'Hybrid', label: 'Desktop + Python' }, { val: 'Offline', label: 'Air-gapped deploy' }],
-    shots: ['Profile Input Form', 'Prediction Output', 'Temperature Curve']
+    num: "/09", title: "Document Classification Pipeline", subtitle: "OCR and GPT Filing at Batch Scale",
+    href: "#",
+    problem: "A law firm receives thousands of scanned documents a month: faxes, medical reports, deposition transcripts, insurer correspondence. Each one has to be identified by type and matched to the right case file. It is slow, repetitive clerical work, and it goes wrong exactly when volume is highest.",
+    approach: "Two tiers of parallelism. Long lived worker <strong>processes</strong> each fan documents across a thread pool, so the heavy OCR and model imports are paid once rather than per batch, and workers recycle after 50 batches to bound native memory growth. The classification prompt forces a decision order and names the mistakes to avoid, and a <strong>three stage cross check</strong> verifies the label against what the case system already knows.",
+    stack: ["OCR Preprocessing", "Process + Thread Pools", "GPT-4.1 Classification", "Run-Time Taxonomy", "3-Stage Cross-Check", "Per-Firm Tenancy"],
+    metrics: [{ val: "16", label: "Document types" }, { val: "3", label: "Verification stages" }, { val: "50", label: "Batches per worker" }, { val: "4", label: "Retry ladders" }],
+    shots: ["Batch Queue", "Classification Result", "Cross-Check Trace"]
   },
   {
-    num: '/10', title: 'MERN CRUD Web App', subtitle: 'Full-Stack Production Starter',
-    href: 'https://github.com/VisalChathuranga/Visal-CRUD-WebApp.git',
-    problem: 'Most full-stack starter projects skip auth security or use brittle patterns. I wanted to build something I\'d actually be comfortable shipping — proper JWT auth, a clean REST API, and PDF exports built in from the start.',
-    approach: '<strong>JWT + bcrypt</strong> handles authentication the right way. Express and MongoDB Atlas back the RESTful API. Reports export to PDF via jsPDF. The UI uses a glassmorphism design system that holds up consistently across every screen size.',
-    stack: ['React UI', 'Express REST API', 'MongoDB Atlas', 'JWT Auth', 'bcrypt Hashing', 'jsPDF Reports'],
-    metrics: [{ val: 'JWT', label: 'Stateless auth' }, { val: 'PDF', label: 'Export support' }, { val: 'REST', label: 'API design' }, { val: '100%', label: 'Responsive' }],
-    shots: ['Dashboard View', 'CRUD Operations', 'PDF Report Output']
+    num: "/10", title: "Custodian", subtitle: "Multi-Tenant Document Management SaaS",
+    href: "#",
+    problem: "Organisations handling sensitive files need a vault where their data is genuinely isolated from every other customer, where a scanned PDF is still searchable, and where every action is audit logged. When the customer is a law firm, a shared table with a tenant column is a hard conversation to have.",
+    approach: "A control plane database holds organisations, plans and subscriptions, and <strong>every organisation gets its own schema</strong> created at signup. Uploads try embedded text first and fall back to a separate <strong>Python OCR service</strong> only when the text layer is thin, which keeps the expensive path off most documents. Search is optional by design: with no search server configured the app still runs, it just loses ranking.",
+    stack: ["Schema-Per-Tenant MySQL", "FastAPI OCR Service", "Meilisearch Index", "Expiring Share Links", "Document Versioning", "Stripe Billing"],
+    metrics: [{ val: "88", label: "API endpoints" }, { val: "50", label: "App screens" }, { val: "3", label: "Access roles" }, { val: "10", label: "OCR jobs in flight" }],
+    shots: ["Document Library", "Advanced Search", "Billing Console"]
+  },
+  {
+    num: "/11", title: "IELTS Prep Platform", subtitle: "AI Band Scoring and Bilingual Tutoring",
+    href: "#",
+    problem: "IELTS preparation in Sri Lanka is expensive and mostly one to one. The parts a learner most needs feedback on, writing and speaking, are exactly the parts a textbook cannot mark. And a beginner needs that feedback explained in the language they actually think in.",
+    approach: "A single provider abstraction sits over <strong>OpenAI and Claude</strong>, so the grader switches with one environment variable. The official band descriptors go into the prompt as an explicit rubric and marking runs criterion by criterion at low temperature, which produces a band with reasoning rather than a guess. Review scheduling uses <strong>FSRS</strong>, and pronunciation work targets the phonemes Sinhala and Tamil speakers actually trip on.",
+    stack: ["FastAPI + SQLModel", "OpenAI / Claude Grading", "Band Descriptor Rubric", "FSRS Scheduling", "Whisper Speech Input", "Next.js PWA"],
+    metrics: [{ val: "4", label: "IELTS skills covered" }, { val: "2", label: "Interchangeable LLMs" }, { val: "FSRS", label: "Review scheduling" }, { val: "PWA", label: "Works offline" }],
+    shots: ["Writing Feedback", "Speaking Drill", "Review Queue"]
+  },
+  {
+    num: "/12", title: "Build Orchestrator", subtitle: "17 Agent Phased Build System",
+    href: "#",
+    problem: "Running a large build through an AI agent burns context faster than anyone expects. Without a budget, the useful instructions get pushed out by accumulated transcript, and output quality falls off a cliff somewhere in the middle where nobody is watching.",
+    approach: "Seventeen agents run across <strong>seven phases</strong> with three always on layers in front of them: a token cost manager, a skill advisor and a prompt engineer. Skills route across two libraries so an agent is handed only what its role needs. Twenty MCP servers are exposed through <strong>per agent allowlists</strong> instead of one shared tool surface, which keeps each agent's decision space small.",
+    stack: ["7 Build Phases", "17 Agents", "Token Cost Manager", "Skill Advisor", "20 MCP Servers", "Per-Agent Allowlists"],
+    metrics: [{ val: "17", label: "Agents" }, { val: "7", label: "Build phases" }, { val: "2,195", label: "Skills" }, { val: "30&ndash;70%", label: "Token reduction" }],
+    shots: ["Phase Timeline", "Agent Allowlist", "Token Report"]
+  },
+  {
+    num: "/13", title: "AI Voice Agent", subtitle: "RAG & Telephony Integration",
+    href: "https://github.com/VisalChathuranga/Voice-Agent-Web-Interface",
+    problem: "Phone bots are still painful. They break on anything unexpected and cannot answer a question from your own documentation. Businesses need something that picks up the phone and holds an actual conversation.",
+    approach: "The <strong>OpenAI Realtime API</strong> is wired into Twilio's phone network with live two way audio streaming. The system runs in two modes: full agentic with RAG, web search and tool calls for general use, and <strong>documents only</strong> for industries where an answer sourced from the open web is a compliance problem. Voice activity detection handles turn taking.",
+    stack: ["Twilio Telephony", "OpenAI Realtime API", "Pinecone RAG", "Web Search Tools", "WebSocket Bridge", "Monitor UI"],
+    metrics: [{ val: "2", label: "Operational modes" }, { val: "Live", label: "Two-way streaming" }, { val: "PSTN", label: "Phone integration" }, { val: "RAG", label: "Grounded answers" }],
+    shots: ["Voice Dashboard", "Call Monitor", "RAG Config Panel"]
+  },
+  {
+    num: "/14", title: "EHR AI Search", subtitle: "Healthcare Intelligence Platform",
+    href: "https://github.com/VisalChathuranga/EHR-AI-Search.git",
+    problem: "EHR interfaces were not designed for speed. A clinician clicks through five screens to pull basic patient data, under time pressure. Natural language could cut that to one question, but EHR APIs expect structured calls and their sessions expire constantly.",
+    approach: "<strong>GPT-4o Mini</strong> takes whatever the clinician types and turns it into a structured EHR API call. Playwright runs in the background to refresh tokens silently, so the session never dies mid consultation. It ships as a <strong>React widget</strong> that embeds into any EHR frame, with a FastAPI backend handling caching and the voice query path.",
+    stack: ["React Embed Widget", "FastAPI Backend", "GPT-4o Mini", "EHR REST APIs", "Playwright Auth", "Vercel Edge"],
+    metrics: [{ val: "NL", label: "Natural language" }, { val: "Voice", label: "Input and output" }, { val: "Widget", label: "Embeddable" }, { val: "Auto", label: "Token refresh" }],
+    shots: ["Chat Widget", "EHR Data View", "Voice Query Mode"]
+  },
+  {
+    num: "/15", title: "MedScribe Pro", subtitle: "Medical Transcription & Summaries",
+    href: "https://github.com/VisalChathuranga/voice-to-summary",
+    problem: "Transcribing a consultation by hand takes almost as long as the consultation. Generic transcription makes it worse, because it has no idea who is speaking. You cannot write a clinical summary if you cannot separate the doctor's words from the patient's.",
+    approach: "<strong>AWS Transcribe Medical</strong> with diarization labels each speaker as doctor, patient or nurse. Large audio files go through S3 with multipart uploads and transfer acceleration so upload is not the bottleneck. <strong>GPT-4</strong> then reads the role labelled transcript and writes a structured clinical summary from it.",
+    stack: ["Audio Upload", "S3 Transfer Accel.", "AWS Transcribe Med.", "Speaker Diarization", "GPT-4 Summaries", "FastAPI"],
+    metrics: [{ val: "3", label: "Speaker roles" }, { val: "Multipart", label: "Large file upload" }, { val: "Concurrent", label: "Worker pool" }, { val: "Clinical", label: "Summary format" }],
+    shots: ["Audio Upload", "Role-labeled Transcript", "Clinical Summary"]
+  },
+  {
+    num: "/16", title: "WhatsApp Petty Cash", subtitle: "Multi-tenant Expense SaaS",
+    href: "https://github.com/VisalChathuranga/Petty-Cash-System-via-whatsapp-using-python",
+    problem: "Getting field employees to adopt a new expense app does not happen. They are already on WhatsApp all day. Finance still needs audit trails and structured data, so the question was whether WhatsApp could be the front end for a real SaaS backend.",
+    approach: "Employees message a receipt photo to a <strong>WhatsApp bot</strong>. Textract and GPT pull out the structured fields, and a rules engine validates them before anything reaches a human. The FastAPI backend handles multi tenant provisioning, role based access and a full audit log, and finance reviews everything through a <strong>Next.js</strong> admin dashboard.",
+    stack: ["WhatsApp Business API", "FastAPI Backend", "Textract OCR", "Rules Engine", "Role-Based Access", "Next.js Admin"],
+    metrics: [{ val: "2", label: "Filing channels" }, { val: "OCR", label: "Receipt parsing" }, { val: "RBAC", label: "Access control" }, { val: "Audit", label: "Full logging" }],
+    shots: ["WhatsApp Bot Flow", "Receipt OCR Result", "Admin Dashboard"]
+  },
+  {
+    num: "/17", title: "Textract Invoice Processor", subtitle: "LLM-Enhanced Document Pipeline",
+    href: "https://github.com/VisalChathuranga/Amazon-Textract-Invoice-PDF-Processor-with-LLM.git",
+    problem: "Every vendor formats invoices differently. Finance teams were keying in data from hundreds of documents a month, catching duplicates by eye, and still ending up with mismatched field names downstream.",
+    approach: "<strong>AWS Textract</strong> pulls text and tables from PDFs and scans, and an MD5 hash catches duplicates before they reach the pipeline at all. A <strong>Gemini layer</strong> then normalises the inconsistent field names, date formats and currency notations that different vendors throw at it, and emits clean structured JSON.",
+    stack: ["S3 Document Store", "AWS Textract OCR", "MD5 Dedup Check", "Table Parsing", "Gemini Normalisation", "Structured JSON"],
+    metrics: [{ val: "95%", label: "Parse accuracy" }, { val: "80%", label: "Manual effort cut" }, { val: "MD5", label: "Dedup detection" }, { val: "Multi", label: "Format support" }],
+    shots: ["Invoice Upload", "Extracted Fields", "Normalised Output"]
+  },
+  {
+    num: "/18", title: "Diabetic Retinopathy Detection", subtitle: "Deep Learning Severity Classifier",
+    href: "https://github.com/VisalChathuranga/Diabetic-Retinopathy-Detection",
+    problem: "Diabetic retinopathy is a leading cause of blindness in working age adults, and it is preventable when caught early. Screening needs a specialist to grade every retinal photograph, and there are nowhere near enough of them for the population that needs checking.",
+    approach: "<strong>EfficientNetB3</strong> with Ben Graham preprocessing grades a retinal image into five severity levels. Training runs in two phases with mixed precision and weighted sampling to survive the heavy class imbalance, and splits are made <strong>at patient level</strong> so the same eye never appears in both training and validation. Checkpoints auto resume, so a free tier GPU session that dies mid run costs nothing.",
+    stack: ["Ben Graham Preprocessing", "EfficientNetB3", "Weighted Sampling", "Mixed Precision fp16", "Patient-Level Splits", "Test Time Augmentation"],
+    metrics: [{ val: "0.83", label: "QWK on APTOS" }, { val: "5", label: "Severity grades" }, { val: "35K+", label: "Images trained" }, { val: "fp16", label: "Mixed precision" }],
+    shots: ["Retinal Input", "Severity Grading", "Training Curves"]
+  },
+  {
+    num: "/19", title: "YouTube Sentiment Insights", subtitle: "ML Pipeline & Chrome Extension",
+    href: "https://github.com/VisalChathuranga/YouTube-Sentiment-Insights-Plugin",
+    problem: "Reading ten thousand YouTube comments to understand how an audience actually feels is not something a person does well. The signal is there, but pulling it out needs automation that runs where the viewer already is.",
+    approach: "A <strong>LightGBM</strong> classifier trained on TF-IDF features from comment text. DVC versions the data and model artifacts so a result can be reproduced, and MLflow tracks experiments. The backend runs as a Dockerised Flask API on EC2 with GitHub Actions handling deploys, and a <strong>Chrome extension</strong> surfaces sentiment directly on the YouTube page.",
+    stack: ["YouTube Comments API", "NLTK / TF-IDF", "LightGBM Model", "MLflow Tracking", "DVC Pipeline", "Flask + Docker + EC2"],
+    metrics: [{ val: "87%", label: "Classification acc." }, { val: "Real-time", label: "Analysis" }, { val: "CI/CD", label: "GitHub Actions" }, { val: "DVC", label: "Reproducible" }],
+    shots: ["Chrome Extension UI", "Sentiment Dashboard", "Pipeline DAG"]
+  },
+  {
+    num: "/20", title: "Sentiment Analysis Pipeline", subtitle: "Reproducible ML with DVC",
+    href: "https://github.com/VisalChathuranga/Sentiment-Analysis-Pipeline-using-DVC",
+    problem: "ML experiments without versioning are miserable to reproduce. Change one preprocessing step, rerun everything from scratch, and hours disappear. The pipeline should rerun only what actually changed.",
+    approach: "A <strong>dvc.yaml</strong> file declares all five stages. Touch one and DVC reruns only what depends on it. Gradient Boosting on NLTK features reaches 87% accuracy on tweet emotion detection, and the whole thing stays reproducible across machines because the data and the artifacts are versioned alongside the code.",
+    stack: ["Raw Tweet Dataset", "DVC Data Versioning", "NLTK Preprocessing", "TF-IDF Features", "Gradient Boosting", "DVC Evaluation"],
+    metrics: [{ val: "87%", label: "Accuracy" }, { val: "5", label: "Pipeline stages" }, { val: "Selective", label: "Stage reruns" }, { val: "100%", label: "Reproducible" }],
+    shots: ["Pipeline DAG View", "Experiment Metrics", "Confusion Matrix"]
+  },
+  {
+    num: "/21", title: "Reflow Oven Predictor", subtitle: "Industrial AI Desktop App",
+    href: "https://github.com/VisalChathuranga/AI-Based-Desktop-Application-for-Reflow-Oven-Profile-Predictor",
+    problem: "Getting a reflow oven profile right is slow. Adjust a parameter, run a full cycle, see what happened. One bad board can mean scrapping a batch, so there had to be a way to predict the right profile before committing to a run.",
+    approach: "A <strong>Keras neural network</strong> trained on historical oven data predicts optimal parameters from board specification and paste type. It is packaged as a hybrid <strong>Electron.js</strong> desktop app with a Python Flask backend, so technicians get a native interface that works completely offline on an air gapped factory machine.",
+    stack: ["PCB Spec Input", "Electron.js UI", "Python Flask API", "Keras Neural Net", "Profile Prediction", "Offline Deployment"],
+    metrics: [{ val: "Fewer", label: "Trial cycles" }, { val: "Neural", label: "Network model" }, { val: "Hybrid", label: "Desktop + Python" }, { val: "Offline", label: "Air-gapped" }],
+    shots: ["Profile Input Form", "Prediction Output", "Temperature Curve"]
+  },
+  {
+    num: "/22", title: "MERN CRUD Web App", subtitle: "Full-Stack Production Starter",
+    href: "https://github.com/VisalChathuranga/Visal-CRUD-WebApp.git",
+    problem: "Most full stack starter projects skip auth security or lean on brittle patterns. I wanted something I would actually be comfortable shipping: proper JWT auth, a clean REST API, and PDF export built in from the start rather than bolted on.",
+    approach: "<strong>JWT and bcrypt</strong> handle authentication properly rather than approximately. Express and MongoDB Atlas back the RESTful API, and reports export to PDF client side. The interface uses one design system that holds up consistently at every screen size instead of breaking below tablet width.",
+    stack: ["React UI", "Express REST API", "MongoDB Atlas", "JWT Auth", "bcrypt Hashing", "PDF Reports"],
+    metrics: [{ val: "JWT", label: "Stateless auth" }, { val: "PDF", label: "Export support" }, { val: "REST", label: "API design" }, { val: "100%", label: "Responsive" }],
+    shots: ["Dashboard View", "CRUD Operations", "PDF Report Output"]
   }
 ];
 
@@ -3312,7 +4233,16 @@ var csStudies = [
     document.getElementById('csNum').textContent = d.num;
     document.getElementById('csTitle').textContent = d.title;
     document.getElementById('csSubtitle').textContent = d.subtitle;
-    document.getElementById('csLink').href = d.href;
+    // Client and private projects have no public repo. Hide the link instead of
+    // leaving a dead "GitHub" anchor pointing at '#'.
+    var csLink = document.getElementById('csLink');
+    if (d.href && d.href !== '#') {
+      csLink.href = d.href;
+      csLink.hidden = false;
+    } else {
+      csLink.removeAttribute('href');
+      csLink.hidden = true;
+    }
     document.getElementById('csCount').textContent = (idx + 1) + ' / ' + csStudies.length;
     document.getElementById('csProblem').innerHTML = d.problem;
     document.getElementById('csApproach').innerHTML = d.approach;
@@ -3572,7 +4502,7 @@ var csStudies = [
         var ld = lx * lx + ly * ly;
         if (ld < LINK * LINK) {
           var t = 1 - Math.sqrt(ld) / LINK;
-          ctx.strokeStyle = 'rgba(197,255,58,' + (t * 0.16).toFixed(3) + ')';
+          ctx.strokeStyle = 'rgba(92,63,163,' + (t * 0.20).toFixed(3) + ')';
           ctx.lineWidth = t * 0.9;
           ctx.beginPath();
           ctx.moveTo(p.x, p.y);
@@ -3590,7 +4520,7 @@ var csStudies = [
         var cd = cx * cx + cy * cy;
         if (cd < PULL * PULL) {
           var ct = 1 - Math.sqrt(cd) / PULL;
-          ctx.strokeStyle = 'rgba(197,255,58,' + (ct * 0.42).toFixed(3) + ')';
+          ctx.strokeStyle = 'rgba(164,95,0,' + (ct * 0.42).toFixed(3) + ')';
           ctx.lineWidth = ct * 1.1;
           ctx.beginPath();
           ctx.moveTo(mx, my);
@@ -3606,7 +4536,7 @@ var csStudies = [
       var tw = p.a * (0.7 + 0.3 * Math.sin(p.t * 1.6));
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.r, 0, 6.2832);
-      ctx.fillStyle = 'rgba(197,255,58,' + tw.toFixed(3) + ')';
+      ctx.fillStyle = 'rgba(92,63,163,' + tw.toFixed(3) + ')';
       ctx.fill();
     }
 
@@ -3640,134 +4570,429 @@ var csStudies = [
   }
 })();
 
-// ============ HERO WEBGL SHADER FLUID ============
+// ============ HERO BRAIN CONSTELLATION (3D, rotating) ============
+// Dala's signature gesture: knowledge as distributed intelligence. A brain
+// built from thousands of small OUTLINED triangles in the brand's chromatic
+// spectrum, assembled from a scatter on load and then turning slowly on its
+// vertical axis. Canvas 2D - no WebGL context to fail on.
 (function() {
-  var canvas = document.getElementById('heroShader');
+  var canvas = document.getElementById('heroConstellation');
   if (!canvas) return;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var ctx = canvas.getContext('2d');
+  if (!ctx) return;
 
-  var gl = canvas.getContext('webgl', { antialias: false, alpha: true, premultipliedAlpha: false })
-        || canvas.getContext('experimental-webgl');
-  if (!gl) return;   // graceful: dark background stays
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  var VERT = [
-    'attribute vec2 p;',
-    'void main(){ gl_Position = vec4(p,0.0,1.0); }'
-  ].join('\n');
+  // ── form ──────────────────────────────────────────────────────────────
+  // 'brain'  - the hand-traced profile with its sulci, below
+  // 'sphere' - the same triangles massed on a plain sphere instead
+  // Change this one string to swap; everything else is shared.
+  var SHAPE = 'sphere';
+  var IS_SPHERE = (SHAPE === 'sphere');
 
-  var FRAG = [
-    'precision mediump float;',
-    'uniform vec2  u_res;',
-    'uniform float u_time;',
-    'uniform vec2  u_mouse;',
-    // hash + value noise
-    'float hash(vec2 q){ return fract(sin(dot(q, vec2(127.1,311.7))) * 43758.5453); }',
-    'float noise(vec2 q){',
-    '  vec2 i = floor(q); vec2 f = fract(q);',
-    '  vec2 u = f*f*(3.0-2.0*f);',
-    '  float a = hash(i);',
-    '  float b = hash(i+vec2(1.0,0.0));',
-    '  float c = hash(i+vec2(0.0,1.0));',
-    '  float d = hash(i+vec2(1.0,1.0));',
-    '  return mix(mix(a,b,u.x), mix(c,d,u.x), u.y);',
-    '}',
-    'float fbm(vec2 q){',
-    '  float v = 0.0; float amp = 0.5;',
-    '  for(int k=0;k<5;k++){ v += amp*noise(q); q*=2.02; amp*=0.5; }',
-    '  return v;',
-    '}',
-    'void main(){',
-    '  vec2 uv = gl_FragCoord.xy / u_res.xy;',
-    '  float ar = u_res.x / u_res.y;',
-    '  vec2 st = uv; st.x *= ar;',
-    '  float t = u_time * 0.035;',
-    '  vec2 m = u_mouse; m.x *= ar;',
-    '  vec2 toM = st - m;',
-    '  float md = length(toM);',
-    '  float mInf = exp(-md*md*2.2) * 0.6;',           // subtle ripple toward cursor
-    // domain-warped flow
-    '  vec2 q = vec2(fbm(st*1.6 + vec2(0.0, t)), fbm(st*1.6 + vec2(5.2, -t)));',
-    '  vec2 r = vec2(fbm(st*1.6 + 3.0*q + vec2(1.7,9.2) + t),',
-    '                fbm(st*1.6 + 3.0*q + vec2(8.3,2.8) - t));',
-    '  float f = fbm(st*1.6 + 2.4*r + mInf);',
-    '  float filament = smoothstep(0.55, 0.92, f);',
-    '  float veins = pow(filament, 1.6);',
-    '  vec3 bg = vec3(0.039, 0.039, 0.035);',
-    '  vec3 accent = vec3(0.773, 1.0, 0.227);',
-    '  vec3 dim = vec3(0.561, 0.722, 0.145);',
-    '  vec3 col = bg;',
-    '  col = mix(col, dim,    veins * 0.10);',
-    '  col = mix(col, accent, smoothstep(0.78, 0.98, f) * (0.13 + mInf*0.25));',
-    // faint large-scale glow toward top-left where the headline sits low-density
-    '  float vign = smoothstep(1.25, 0.15, length(uv - vec2(0.5)));',
-    '  col *= 0.85 + 0.15*vign;',
-    '  gl_FragColor = vec4(col, 1.0);',
-    '}'
-  ].join('\n');
+  // ── silhouette ────────────────────────────────────────────────────────
+  // Hand-traced brain profile, side view facing right, clockwise from the
+  // frontal pole: cortex over the top, occipital taper at the back, the
+  // cerebellum bulge, the stem, then the temporal lobe underneath. A union
+  // of circles was tried first and always collapsed back into a circle -
+  // only an explicit outline holds the profile.
+  var OUTLINE = [
+    [ 0.97,  0.10], [ 0.93,  0.40], [ 0.80,  0.62], [ 0.58,  0.78],
+    [ 0.30,  0.87], [ 0.00,  0.88], [-0.30,  0.82], [-0.58,  0.68],
+    [-0.80,  0.46], [-0.93,  0.18], [-0.98, -0.10], [-0.94, -0.32],
+    [-0.84, -0.44],
+    [-0.88, -0.62], [-0.74, -0.76], [-0.55, -0.80], [-0.40, -0.70], [-0.34, -0.55],
+    [-0.28, -0.62], [-0.22, -0.95], [-0.06, -0.95], [-0.04, -0.60],
+    [ 0.06, -0.52], [ 0.22, -0.54], [ 0.40, -0.60], [ 0.56, -0.58],
+    [ 0.70, -0.48], [ 0.80, -0.32], [ 0.86, -0.14], [ 0.93, -0.04]
+  ];
 
-  function compile(type, src) {
-    var sh = gl.createShader(type);
-    gl.shaderSource(sh, src);
-    gl.compileShader(sh);
-    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
-      console.warn('shader compile:', gl.getShaderInfoLog(sh));
-      return null;
+  var D = Math.PI / 180;
+  // Sulci: one concentric family sweeping around the Sylvian point, which is
+  // how cortical folding actually runs. The per-angle wobble is what stops
+  // them reading as bullseye rings. This - not the outline - is what makes
+  // the cloud legible as a brain.
+  // [cx, cy, R, startDeg, endDeg, grooveWidth, wobble, phase]
+  var SULCI = [
+    [ 0.10, -0.10, 0.30,  15, 205, 0.030, 0.10, 0.4],
+    [ 0.10, -0.10, 0.48,   8, 210, 0.030, 0.09, 2.1],
+    [ 0.10, -0.10, 0.66,   2, 200, 0.030, 0.08, 4.0],
+    [ 0.10, -0.10, 0.84,  10, 185, 0.028, 0.07, 1.2],
+    [ 0.10, -0.10, 1.00,  20, 170, 0.026, 0.06, 3.3],
+    [-0.60, -0.64, 0.16, 300, 460, 0.018, 0.05, 0.0],
+    [-0.60, -0.64, 0.27, 310, 450, 0.018, 0.05, 1.6]
+  ];
+  var SYLVIAN = [0.95, -0.14, -0.16, -0.24, 0.050];
+
+  function inPoly(x, y) {
+    var inside = false;
+    for (var a = 0, b = OUTLINE.length - 1; a < OUTLINE.length; b = a++) {
+      var xi = OUTLINE[a][0], yi = OUTLINE[a][1];
+      var xj = OUTLINE[b][0], yj = OUTLINE[b][1];
+      if ((yi > y) !== (yj > y) &&
+          x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
     }
-    return sh;
+    return inside;
   }
-  var vs = compile(gl.VERTEX_SHADER, VERT);
-  var fs = compile(gl.FRAGMENT_SHADER, FRAG);
-  if (!vs || !fs) return;
+  function segDist(x, y, ax, ay, bx, by) {
+    var dx = bx - ax, dy = by - ay, l2 = dx * dx + dy * dy;
+    var t = l2 ? ((x - ax) * dx + (y - ay) * dy) / l2 : 0;
+    if (t < 0) t = 0; else if (t > 1) t = 1;
+    var qx = ax + t * dx - x, qy = ay + t * dy - y;
+    return Math.sqrt(qx * qx + qy * qy);
+  }
+  // distance to a wobbling arc groove
+  function arcDist(x, y, cx, cy, R, a0, a1, wob, phase) {
+    var dx = x - cx, dy = y - cy;
+    var r = Math.sqrt(dx * dx + dy * dy);
+    var a = Math.atan2(dy, dx);
+    while (a < a0 - Math.PI) a += 2 * Math.PI;
+    while (a > a0 + Math.PI) a -= 2 * Math.PI;
+    var Re = R * (1 + wob * Math.sin(3 * a + phase) + wob * 0.6 * Math.sin(5 * a - phase));
+    if (a >= a0 && a <= a1) return Math.abs(r - Re);
+    var x0 = cx + Re * Math.cos(a0), y0 = cy + Re * Math.sin(a0);
+    var x1 = cx + Re * Math.cos(a1), y1 = cy + Re * Math.sin(a1);
+    return Math.min(Math.sqrt((x - x0) * (x - x0) + (y - y0) * (y - y0)),
+                    Math.sqrt((x - x1) * (x - x1) + (y - y1) * (y - y1)));
+  }
+  function inBrain(x, y) {
+    if (!inPoly(x, y)) return false;
+    // the Sylvian fissure is a straight deep cleft, not an arc
+    if (segDist(x, y, SYLVIAN[0], SYLVIAN[1], SYLVIAN[2], SYLVIAN[3]) < SYLVIAN[4]) return false;
+    // separate the cerebellum from the cerebrum above it
+    if (segDist(x, y, -0.95, -0.42, -0.30, -0.52) < 0.030) return false;
+    for (var k = 0; k < SULCI.length; k++) {
+      var u = SULCI[k];
+      if (arcDist(x, y, u[0], u[1], u[2], u[3] * D, u[4] * D, u[6], u[7]) < u[5]) return false;
+    }
+    return true;
+  }
+  // distance to the silhouette edge - drives how thick the brain is at (x,y)
+  function edgeDist(x, y) {
+    var m = 1e9;
+    for (var a = 0, b = OUTLINE.length - 1; a < OUTLINE.length; b = a++) {
+      var d = segDist(x, y, OUTLINE[a][0], OUTLINE[a][1],
+                            OUTLINE[b][0], OUTLINE[b][1]);
+      if (d < m) m = d;
+    }
+    return m;
+  }
 
-  var prog = gl.createProgram();
-  gl.attachShader(prog, vs);
-  gl.attachShader(prog, fs);
-  gl.linkProgram(prog);
-  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return;
-  gl.useProgram(prog);
+  // ── palette: amber toward the front, cool violets and teal at the back,
+  //    which is what gives the reference its warm-to-cool sweep ───────────
+  var WARM = ['#a45f00', '#c07b1d', '#a45f00', '#b96b12'];
+  var COOL = ['#5c3fa3', '#775cb8', '#2f5f9f', '#087566', '#9b356b', '#334653'];
+  var COLORS = WARM.concat(COOL);
 
-  var buf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
-  var loc = gl.getAttribLocation(prog, 'p');
-  gl.enableVertexAttribArray(loc);
-  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  // A brain is a good deal narrower than it is long. At 0.60 the cloud was
+  // nearly spherical, which is why it read as a blob from every angle.
+  var DEPTH = 0.40;          // half-thickness of the brain at its fattest
+  var FOV   = 3.2;           // perspective strength
+  var SWAY  = 0.62;          // auto-rotation swings +/- this many radians
+  var SWAY_SPEED = 0.22;     // ...at this rate, so the profile is never lost
 
-  var uRes = gl.getUniformLocation(prog, 'u_res');
-  var uTime = gl.getUniformLocation(prog, 'u_time');
-  var uMouse = gl.getUniformLocation(prog, 'u_mouse');
+  var pts = [], ambient = [], W = 0, H = 0, dpr = 1;
 
-  var mouse = [0.5, 0.5], tMouse = [0.5, 0.5];
-  var DPR = Math.min(window.devicePixelRatio || 1, 1.5);
+  // pointer-driven rotation, layered on top of the auto-sway
+  var dragging = false, lastX = 0, lastY = 0;
+  var userYaw = 0, userPitch = 0, yawVel = 0, pitchVel = 0;
+
+  function pushPoint(arr, x, y, z, size, colIdx, scatterScale) {
+    // a fixed random orientation per triangle, baked into unit offsets so
+    // the draw loop never has to call rotate()
+    var r = Math.random() * Math.PI * 2;
+    var c = Math.cos(r), sn = Math.sin(r);
+    var ang = Math.random() * Math.PI * 2, pit = Math.random() * Math.PI - Math.PI / 2;
+    var rad = scatterScale * (1.4 + Math.random() * 1.3);
+    arr.push({
+      x: x, y: y, z: z,
+      // where it flies in from
+      sx: Math.cos(ang) * Math.cos(pit) * rad,
+      sy: Math.sin(pit) * rad,
+      sz: Math.sin(ang) * Math.cos(pit) * rad,
+      d: Math.random() * 0.45,
+      s: size,
+      // unit triangle rotated once, reused every frame
+      ax: -sn * -1.0,        ay: c * -1.0,
+      bx: c * 0.866 - sn * 0.5,  by: sn * 0.866 + c * 0.5,
+      cx: c * -0.866 - sn * 0.5, cy: sn * -0.866 + c * 0.5,
+      ci: colIdx,
+      ph: Math.random() * Math.PI * 2,
+      sp: 0.4 + Math.random() * 0.9
+    });
+  }
+
+  function build() {
+    pts = []; ambient = [];
+    var wide = window.innerWidth > 980;
+    // Dropping the sine-noise ridge widened the accept area, so the same
+    // count read as sparse scatter. The sulci carve the structure now;
+    // density is what makes the ribbons between them legible.
+    var TARGET = wide ? 4600 : 1400;
+
+    if (IS_SPHERE) {
+      // Uniform directions on a shell. No rejection sampling needed, so the
+      // guard loop below is skipped entirely.
+      for (var si = 0; si < TARGET; si++) {
+        var u = Math.random() * 2 - 1;
+        var th = Math.random() * Math.PI * 2;
+        var rho = Math.sqrt(1 - u * u);
+        // a little shell thickness, or it reads as a hollow wireframe ball
+        var rr = 0.97 * (1 - Math.random() * 0.08);
+        var sx2 = rho * Math.cos(th) * rr;
+        var sy2 = u * rr;
+        var sz2 = rho * Math.sin(th) * rr;
+
+        // same warm-to-cool sweep across the form as the brain uses
+        var w2 = (sx2 + 0.9) / 1.85;
+        var c2 = Math.random() < w2 * w2
+               ? (Math.random() * WARM.length) | 0
+               : WARM.length + ((Math.random() * COOL.length) | 0);
+
+        pushPoint(pts, sx2, sy2, sz2, 1.5 + Math.random() * 2.0, c2, 1.0);
+      }
+    }
+
+    var guard = 0;
+    while (!IS_SPHERE && pts.length < TARGET && guard < TARGET * 60) {
+      guard++;
+      var x = Math.random() * 2 - 1, y = Math.random() * 2 - 1;
+      if (!inBrain(x, y)) continue;
+
+      // thickness tapers to zero at the silhouette edge, so the outline
+      // stays crisp from every angle as the brain turns
+      var T = DEPTH * Math.sqrt(Math.min(1, edgeDist(x, y) / 0.30));
+      var z;
+      if (Math.random() < 0.72) {
+        // most points sit on the shell - the far wall shows through the near
+        z = (Math.random() < 0.5 ? -T : T) * (0.86 + Math.random() * 0.14);
+      } else {
+        z = (Math.random() * 2 - 1) * T;
+      }
+
+      // warm at the front of the head, cool toward the back
+      var warmth = (x + 0.9) / 1.85;
+      var col = Math.random() < warmth * warmth
+              ? (Math.random() * WARM.length) | 0
+              : WARM.length + ((Math.random() * COOL.length) | 0);
+
+      pushPoint(pts, x, y, z, 1.5 + Math.random() * 2.0, col, 1.0);
+    }
+
+    // the big scattered triangles drifting around the brain
+    var AMB = wide ? 26 : 10;
+    for (var k = 0; k < AMB; k++) {
+      pushPoint(ambient,
+        (Math.random() * 2 - 1) * 1.25,
+        (Math.random() * 2 - 1) * 1.05,
+        (Math.random() * 2 - 1) * 0.9,
+        5 + Math.random() * 9,
+        (Math.random() * COLORS.length) | 0, 1.6);
+    }
+  }
 
   function resize() {
-    var w = canvas.offsetWidth, h = canvas.offsetHeight;
-    canvas.width = Math.round(w * DPR);
-    canvas.height = Math.round(h * DPR);
-    gl.viewport(0, 0, canvas.width, canvas.height);
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = canvas.clientWidth; H = canvas.clientHeight;
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
-  resize();
-  window.addEventListener('resize', resize);
 
-  document.addEventListener('mousemove', function(e) {
-    var r = canvas.getBoundingClientRect();
-    tMouse[0] = (e.clientX - r.left) / r.width;
-    tMouse[1] = 1 - (e.clientY - r.top) / r.height;
+  // Triangles are batched into (colour x alpha-bucket) paths and stroked
+  // once per bucket. Stroking each of 2,200 triangles on its own was the
+  // one thing that made this too slow to run at 60fps.
+  var ABUCKETS = 6;
+  var bins = [];
+  for (var bi = 0; bi < COLORS.length * ABUCKETS; bi++) bins.push([]);
+
+  function draw(t, prog) {
+    ctx.clearRect(0, 0, W, H);
+    for (var b = 0; b < bins.length; b++) bins[b].length = 0;
+
+    var cx = W / 2, cy = H / 2;
+    var R = Math.min(W, H) * 0.46;
+
+    // auto-sway keeps it moving; drag is added on top and decays with inertia
+    // Gentler under reduced motion, but still perceptible - at 0.45x/0.35x
+    // it swung 8px over 26s, which is indistinguishable from frozen and is
+    // what made this look broken to anyone with OS animations switched off.
+    var swayAmp = reduced ? SWAY * 0.70 : SWAY;
+    var swaySpd = reduced ? SWAY_SPEED * 0.60 : SWAY_SPEED;
+    // The brain only reads in profile, so it sways. A sphere looks the same
+    // from every angle and can simply keep turning.
+    var autoYaw = IS_SPHERE ? t * (reduced ? 0.05 : 0.13)
+                            : Math.sin(t * swaySpd) * swayAmp;
+    if (!dragging) {
+      userYaw += yawVel; yawVel *= 0.94;
+      userPitch += pitchVel; pitchVel *= 0.94;
+      if (Math.abs(yawVel) < 1e-4) yawVel = 0;
+      if (Math.abs(pitchVel) < 1e-4) pitchVel = 0;
+    }
+    if (userPitch > 0.55) userPitch = 0.55;
+    if (userPitch < -0.55) userPitch = -0.55;
+
+    var yaw = autoYaw + userYaw;
+    var ca = Math.cos(yaw), sa = Math.sin(yaw);
+    var cp = Math.cos(userPitch), sp = Math.sin(userPitch);
+
+    collect(pts, cx, cy, R, ca, sa, cp, sp, t, prog, 1);
+    collect(ambient, cx, cy, R * 1.05, ca, sa, cp, sp, t, prog, 0.55);
+
+    for (var k = 0; k < bins.length; k++) {
+      var arr = bins[k];
+      if (!arr.length) continue;
+      ctx.beginPath();
+      for (var m = 0; m < arr.length; m += 6) {
+        ctx.moveTo(arr[m], arr[m + 1]);
+        ctx.lineTo(arr[m + 2], arr[m + 3]);
+        ctx.lineTo(arr[m + 4], arr[m + 5]);
+        ctx.closePath();
+      }
+      ctx.globalAlpha = ((k % ABUCKETS) + 1) / ABUCKETS * 0.85;
+      ctx.strokeStyle = COLORS[(k / ABUCKETS) | 0];
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function collect(list, cx, cy, R, ca, sa, cp, sp, t, prog, gain) {
+    for (var i = 0; i < list.length; i++) {
+      var p = list[i];
+
+      // staggered easeOutCubic fly-in
+      var local = (prog - p.d) / (1 - p.d);
+      if (local < 0) local = 0; else if (local > 1) local = 1;
+      var e = 1 - Math.pow(1 - local, 3);
+      if (e <= 0) continue;
+
+      var x = p.sx + (p.x - p.sx) * e;
+      var y = p.sy + (p.y - p.sy) * e;
+      var z = p.sz + (p.z - p.sz) * e;
+
+      // yaw about the vertical axis, then pitch about the horizontal one
+      var rx = x * ca + z * sa;
+      var rz0 = -x * sa + z * ca;
+      var ry = y * cp - rz0 * sp;
+      var rz = y * sp + rz0 * cp;
+
+      var persp = FOV / (FOV - rz);
+      var px = cx + rx * R * persp;
+      var py = cy + ry * R * persp;
+      var size = p.s * persp;
+
+      // nearer triangles read brighter; twinkle only once landed
+      var depth = (rz + 1) / 2;
+      var tw = (0.35 + 0.5 * Math.sin(t * p.sp + p.ph) * 0.5 + 0.3 * depth);
+      var alpha = tw * e * gain;
+      if (alpha <= 0.02) continue;
+      if (alpha > 1) alpha = 1;
+
+      var bucket = (alpha * ABUCKETS) | 0;
+      if (bucket >= ABUCKETS) bucket = ABUCKETS - 1;
+
+      var arr = bins[p.ci * ABUCKETS + bucket];
+      arr.push(px + p.ax * size, py + p.ay * size,
+               px + p.bx * size, py + p.by * size,
+               px + p.cx * size, py + p.cy * size);
+    }
+  }
+
+  var FORM_MS = 2400;                       // how long the brain takes to form
+  var raf = 0, t0 = performance.now(), formT0 = t0, running = true;
+  // The loader covers the hero for ~1.75s. Starting the assembly on page
+  // parse meant it was ~75% finished by the time the loader cleared, so the
+  // fly-in was never actually seen. Nothing runs until armed.
+  var armed = false;
+
+  function frame(now) {
+    if (!running) return;
+    // reduced motion skips the fly-in and shows the assembled brain
+    var prog = reduced ? 1 : (now - formT0) / FORM_MS;
+    if (prog > 1) prog = 1;
+    draw((now - t0) / 1000, prog);
+    raf = requestAnimationFrame(frame);
+  }
+
+  function start(reform) {
+    resize(); build();
+    // the loop always runs - it is what makes drag-to-rotate work at all
+    cancelAnimationFrame(raf);
+    if (reform !== false) formT0 = performance.now();
+    running = true;
+    raf = requestAnimationFrame(frame);
+  }
+
+  // pause offscreen so the hero costs nothing once scrolled past
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function(e) {
+      running = e[0].isIntersecting;
+      if (running && armed) {
+        // scrolling back up re-runs the assembly rather than resuming
+        // mid-rotation, so the gesture is seen more than once
+        t0 = performance.now();
+        formT0 = t0;
+        raf = requestAnimationFrame(frame);
+      }
+    }, { threshold: 0 }).observe(canvas);
+  }
+
+  // ── drag to rotate ────────────────────────────────────────────────────
+  function down(e) {
+    dragging = true;
+    var pt = e.touches ? e.touches[0] : e;
+    lastX = pt.clientX; lastY = pt.clientY;
+    yawVel = pitchVel = 0;
+    canvas.classList.add('grabbing');
+  }
+  function move(e) {
+    if (!dragging) return;
+    var pt = e.touches ? e.touches[0] : e;
+    var dx = pt.clientX - lastX, dy = pt.clientY - lastY;
+    lastX = pt.clientX; lastY = pt.clientY;
+    // velocity is carried so the brain keeps spinning when released
+    yawVel = dx * 0.004;
+    pitchVel = dy * 0.003;
+    userYaw += yawVel;
+    userPitch += pitchVel;
+    if (e.cancelable) e.preventDefault();
+  }
+  function up() {
+    dragging = false;
+    canvas.classList.remove('grabbing');
+  }
+  canvas.addEventListener('mousedown', down);
+  window.addEventListener('mousemove', move);
+  window.addEventListener('mouseup', up);
+  canvas.addEventListener('touchstart', down, { passive: true });
+  canvas.addEventListener('touchmove', move, { passive: false });
+  canvas.addEventListener('touchend', up);
+
+  var rt;
+  window.addEventListener('resize', function() {
+    clearTimeout(rt); rt = setTimeout(function() { start(armed ? false : true); }, 180);
   });
 
-  var start = performance.now();
-  function frame(now) {
-    mouse[0] += (tMouse[0] - mouse[0]) * 0.05;
-    mouse[1] += (tMouse[1] - mouse[1]) * 0.05;
-    gl.uniform2f(uRes, canvas.width, canvas.height);
-    gl.uniform1f(uTime, (now - start) / 1000);
-    gl.uniform2f(uMouse, mouse[0], mouse[1]);
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
-    requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
-})();
+  // Build the points now (cheap, and the canvas is hidden anyway), but hold
+  // the fly-in until the loader is gone.
+  resize(); build();
 
+  function arm() {
+    if (armed) return;
+    armed = true;
+    t0 = performance.now();
+    start(true);
+  }
+
+  var loaderEl = document.getElementById('loader');
+  if (!loaderEl || loaderEl.classList.contains('hide')) {
+    arm();
+  } else {
+    document.addEventListener('portfolio:ready', arm);
+    setTimeout(arm, 3200);                        // net if the event never fires
+  }
+})();
 </script>
 
 <!-- ── COMMAND PALETTE ── -->
@@ -3797,7 +5022,7 @@ var csStudies = [
     { id: 'skills',   icon: '◈', label: 'Jump to Skills',     tag: 'navigate', action: function() { jumpTo('skills'); } },
     { id: 'projects', icon: '◈', label: 'Jump to Projects',   tag: 'navigate', action: function() { jumpTo('projects'); } },
     { id: 'contact',  icon: '◈', label: 'Jump to Contact',    tag: 'navigate', action: function() { jumpTo('contact'); } },
-    { id: 'theme',    icon: '◑', label: 'Toggle Light Theme', tag: 'display',  action: toggleTheme },
+    { id: 'theme',    icon: '◑', label: 'Toggle Dark Theme',  tag: 'display',  action: toggleTheme },
     { id: 'cv',       icon: '↓', label: 'Download CV',        tag: 'file',     action: downloadCV },
     { id: 'email',    icon: '✉', label: 'Copy Email',         tag: 'copy',     action: copyEmail },
     { id: 'github',   icon: '⌥', label: 'Open GitHub',        tag: 'link',     action: function() { window.open('https://github.com/VisalChathuranga','_blank'); } },
@@ -3810,8 +5035,9 @@ var csStudies = [
   var toast    = document.getElementById('cmd-toast');
   var active   = 0;
   var filtered = [];
-  var isLight  = false;
+  var isLight  = true;
   var toastTimer;
+  document.documentElement.dataset.theme = 'light';
 
   function jumpTo(id) {
     var el = document.getElementById(id);
@@ -3836,24 +5062,39 @@ var csStudies = [
     isLight = !isLight;
     var r = document.documentElement.style;
     if (isLight) {
-      r.setProperty('--bg','#f5f0e8');
-      r.setProperty('--bg-elev','#ede8dc');
-      r.setProperty('--bg-soft','#e8e2d4');
-      r.setProperty('--fg','#1a1a16');
-      r.setProperty('--fg-dim','#5a5750');
-      r.setProperty('--fg-mute','#a09c90');
-      r.setProperty('--line','#d4cfc0');
+      r.colorScheme = 'light';
+      r.setProperty('--bg','#f7f1e5');
+      r.setProperty('--bg-rgb','247, 241, 229');
+      r.setProperty('--bg-elev','#fffaf0');
+      r.setProperty('--bg-soft','#eee4d3');
+      r.setProperty('--fg','#211f1a');
+      r.setProperty('--fg-dim','#625d52');
+      r.setProperty('--fg-mute','#696258');
+      r.setProperty('--accent','#5c3fa3');
+      r.setProperty('--accent-dim','#472d86');
+      r.setProperty('--spark','#a45f00');
+      r.setProperty('--accent-glow','rgba(92, 63, 163, 0.14)');
+      r.setProperty('--line','#d5c9b8');
       COMMANDS[5].label = 'Toggle Dark Theme';
     } else {
-      r.setProperty('--bg','#0a0a09');
-      r.setProperty('--bg-elev','#12120f');
-      r.setProperty('--bg-soft','#161612');
-      r.setProperty('--fg','#f2ede1');
-      r.setProperty('--fg-dim','#8f8b80');
-      r.setProperty('--fg-mute','#55524b');
-      r.setProperty('--line','#23231e');
+      r.colorScheme = 'dark';
+      r.setProperty('--bg','#000000');
+      r.setProperty('--bg-rgb','0, 0, 0');
+      r.setProperty('--bg-elev','#000000');
+      r.setProperty('--bg-soft','#000000');
+      r.setProperty('--fg','#ffffff');
+      r.setProperty('--fg-dim','#bdbdbd');
+      r.setProperty('--fg-mute','#9a9a9a');
+      r.setProperty('--accent','#8052ff');
+      r.setProperty('--accent-dim','#6a3fd9');
+      r.setProperty('--spark','#ffb829');
+      r.setProperty('--accent-glow','rgba(128, 82, 255, 0.22)');
+      r.setProperty('--line','transparent');
       COMMANDS[5].label = 'Toggle Light Theme';
     }
+    document.documentElement.dataset.theme = isLight ? 'light' : 'dark';
+    var themeMeta = document.querySelector('meta[name="theme-color"]');
+    if (themeMeta) themeMeta.content = isLight ? '#f7f1e5' : '#000000';
     showToast(isLight ? 'light theme on' : 'dark theme on');
   }
 
